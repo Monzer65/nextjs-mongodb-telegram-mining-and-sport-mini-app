@@ -1,0 +1,100 @@
+{
+  "bot-home-page": {
+    "greating": "Hello",
+    "launching-soon": "We're launching soon, but you can start mining now",
+    "start-earning": "Start Earning Rewards",
+    "click-below": "Click below to try our Mining Mini App before the full launch",
+    "go-to-miner": "Go To Miner",
+    "launching-soon-title": "We Are launching soon",
+    "get-ready": "Get ready for a comprehensive sports hub with live updates, match schedules, player stats, media highlights, and more. Whether you're a casual fan or a die-hard enthusiast, ScoreBoard will be your go-to destination for everything sports",
+    "notify-me": "Notify Me",
+    "placeholder-email": "Your Email Address...",
+    "footer": "© 2024 ScoreBoard. All rights reserved",
+    "powered-by": "Powered by Telegram | Follow us on social media for the latest updates"
+  },
+  "miner": {
+    "header": {
+      "welcome": "welcome",
+      "level": "level",
+      "miner": "miner"
+    },
+    "tabs": {
+      "titles": {
+        "mine": "Mine",
+        "earn": "Earn",
+        "leaderboard": "Leaderboard",
+        "wallet": "Wallet"
+      },
+      "mine-tab": {
+        "title": "Ready to Dig for Riches?",
+        "title-progress": "Mining in Progress",
+        "description": "Prepare yourself to uncover hidden rewards. Start mining now and let the riches flow!",
+        "description-progress": "Your mining operation is underway. Stay tuned as your rewards accumulate",
+        "start-button": "Begin Mining Adventure",
+        "button-progress": "Sit tight"
+      },
+      "earn-tab": {
+        "titles": {
+          "tasks": "tasks",
+          "boost": "boost",
+          "referrals": "referrals",
+          "mini-games": "mini-games"
+        },
+        "tasks-tab": {
+          "on-success-toast": {
+            "no-error": {
+              "title": "Task Completed",
+              "description": "Task completed successfully"
+            },
+            "with-error": {
+              "title": "Task Not Completed",
+              "description": "You are not a member of the required channel"
+            }
+          },
+          "on-error-toast": {
+            "title": "Error",
+            "description": "Failed to check channel membership. Please try again"
+          },
+          "select": {
+            "all-tasks": "All tasks",
+            "completed-tasks": "Completed tasks",
+            "incomplete-tasks": "Incomplete tasks"
+          },
+          "task-1-title": "Join our telegram channel",
+          "task-2-title": "Join our telegram chat",
+          "points": "points",
+          "check-button": "check completion",
+          "check-button-loading": "checking",
+          "check-button-complete": "completed",
+          "join-button": "join"
+        },
+        "referrals-tab": {
+          "toast-success-copy": {
+            "title": "Copied",
+            "description": "The referral link has been copied to clipboard"
+          },
+          "toast-failed-copy": {
+            "title": "Copy failed",
+            "description": "Copying to clipboard failed. Please try manually selecting and copying the link"
+          },
+          "error": {
+            "message": "An error occurred while loading the referrals",
+            "try-again-button": "Ary again"
+          },
+          "header-title": "Referral Program",
+          "header-description": "Invite friends and earn rewards",
+          "link-title": "Your Referral Link",
+          "copy-button": "Copy link",
+          "share-button": "Share via Telegram",
+          "total-referrals": "Total Referrals",
+          "tokens-earned": "Tokens Earned",
+          "table-title": "Referral Users",
+          "table-header-col-username": "Username",
+          "table-header-col-join-date": "Join Date",
+          "footer-text": "Invite more friends to earn additional rewards!"
+        },
+        "boosts-tab": {}
+      }
+    }
+  }
+}
