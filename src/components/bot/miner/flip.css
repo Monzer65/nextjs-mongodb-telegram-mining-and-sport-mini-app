@@ -1,0 +1,14 @@
+.flip-counter {
+  @apply flex items-center justify-center;
+}
+
+.flip-digit {
+  @apply flex flex-col items-center justify-center h-full w-full;
+  span {
+    @apply text-4xl font-bold;
+  }
+}
+
+.decimal-point {
+  @apply text-4xl font-bold;
+}

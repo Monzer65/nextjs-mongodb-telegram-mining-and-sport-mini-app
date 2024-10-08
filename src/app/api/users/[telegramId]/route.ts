@@ -64,24 +64,22 @@ export async function GET(
     });
 
     // Update newScore if the user is still mining
+    // Update newScore if the user is still mining
     if (isMining) {
-      // Calculate the elapsed mining time since the last score update (in seconds)
-      // const miningTimeInSeconds = Math.floor((now - lastScoreUpdate) / 1000);
-      // Use the effective mining speed after applying all boosts
-      // newScore += Math.floor(miningTimeInSeconds * effectiveSpeed);
-
-      // Calculate the elapsed mining time in milliseconds since the last score update
+      // Calculate the elapsed time in milliseconds since the last score update
       const miningTimeInMilliseconds = now - lastScoreUpdate;
 
-      // Add the fractional score based on the elapsed time and effectiveSpeed (in points per millisecond)
-      // Mining speed 1 gives 0.000001 points per millisecond
-      newScore += miningTimeInMilliseconds * effectiveSpeed * 0.000001;
+      // Convert the elapsed time to seconds
+      const miningTimeInSeconds = miningTimeInMilliseconds / 1000; // Convert milliseconds to seconds
+
+      // Update newScore based on effective speed and elapsed time
+      newScore += miningTimeInSeconds * effectiveSpeed * 0.001;
     }
 
     // Prepare updated user data
     const updatedUser = {
       ...user,
-      score: parseFloat(newScore.toFixed(6)),
+      score: parseFloat(newScore.toFixed(3)),
       isMining,
       effectiveSpeed,
       timeRemaining,
