@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type Locale } from "@/i18n-config";
 import { House, Pickaxe, Settings } from "lucide-react";
+import { getDictionary } from "@/get-dictionary";
 
 const links = [
   { href: "/bot", name: "Home", Icon: House },
@@ -12,7 +13,13 @@ const links = [
   { href: "/bot/miner/setting", name: "Setting", Icon: Settings },
 ];
 
-export default function NavigationTabBar() {
+export default function NavigationTabBar({
+  dictionary,
+  lang,
+}: {
+  dictionary: Awaited<ReturnType<typeof getDictionary>>["miner"]["navbar"];
+  lang: Locale;
+}) {
   const pathname = usePathname();
   const locale = pathname.split("/")[1] as Locale;
 
@@ -40,7 +47,11 @@ export default function NavigationTabBar() {
               }`}
             >
               <Icon />
-              <span className='text-sm'>{name}</span>
+              <span className='text-sm'>
+                {name === "Home" && dictionary.home}
+                {name === "Miner" && dictionary.miner}
+                {name === "Setting" && dictionary.setting}
+              </span>
               {isActive && (
                 <div className='absolute -bottom-0 left-1 right-1 h-1 bg-indigo-600 rounded-t-full' />
               )}

@@ -50,6 +50,14 @@ export default function TabLeaderboard() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center h-full'>
+        <Loader2 className='h-8 w-8 animate-spin' />
+      </div>
+    );
+  }
+
   if (isError) {
     return (
       <Card className='w-full max-w-3xl mx-auto'>
@@ -96,17 +104,7 @@ export default function TabLeaderboard() {
             />
           </div>
         </div>
-        {isLoading ? (
-          // skeleton loader
-          // <div className='space-y-2'>
-          //   {[...Array(5)].map((_, i) => (
-          //     <Skeleton key={i} className='w-full h-12' />
-          //   ))}
-          // </div>
-          <div className='flex items-center justify-center h-full'>
-            <Loader2 className='h-8 w-8 animate-spin' />
-          </div>
-        ) : filteredLeaderboard.length === 0 ? (
+        {filteredLeaderboard.length === 0 ? (
           <p className='text-center py-4'>No players found.</p>
         ) : (
           <ScrollArea className='h-[400px] rounded-md border'>

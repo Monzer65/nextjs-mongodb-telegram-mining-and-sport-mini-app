@@ -26,17 +26,24 @@
         "wallet": "کیف پول"
       },
       "mine-tab": {
-        "title": "آماده حفاری هستی؟",
-        "title-progress": "در حال استخراج",
+        "error": {
+          "message": "در بارگزاری داده‌های کاربر خطایی رخ داده",
+          "try-again-button": "دوباره امتحان کنید"
+        },
+        "total-score": "مجموع امتیاز",
+        "time-remaining": "زمان باقی‌مانده",
+        "mining-speed": "سرعت استخراج",
+        "speed-boost": "سرعت افزایشی",
+        "button-start": "شروع کن به استخراج",
+        "button-pending": "در‌حال شروع",
+        "button-progress": "در حال استخراج",
         "description": "همین الان شروع به استخراج کن",
-        "description-progress": "عملیات استخراج شما در حال انجام است. منتظر بمانید تا پاداش‌هایتان جمع‌آوری شوند",
-        "start-button": "استخراج را شروع کن",
-        "button-progress": "در حال استخراج"
+        "description-progress": "عملیات استخراج شما در حال انجام است. منتظر بمانید تا پاداش‌هایتان جمع‌آوری شوند"
       },
       "earn-tab": {
         "titles": {
           "tasks": "تسک‌ها",
-          "boost": "ارتقاء",
+          "boost": "تقویت",
           "referrals": "معرفی شده‌ها",
           "mini-games": "بازی‌های کوچک"
         },
@@ -93,8 +100,45 @@
           "table-header-col-join-date": "تاریخ عضویت",
           "footer-text": "دوستان بیشتری دعوت کنید تا پاداش‌های بیشتری کسب کنید!"
         },
-        "boosts-tab": {}
-      }
+        "boosts-tab": {
+          "toast-success-active": {
+            "title": "بوستر فعال شد",
+            "description": "بوستر با موفقیت فعال شد"
+          },
+          "toast-failed-active": {
+            "title": "خطا",
+            "description": "در فعال‌سازی خطایی رخ داد. بعدا دوباره تلاش کنید"
+          },
+          "error": {
+            "message": "خطایی در بارگزاری بوسترها رخ داده",
+            "try-again-button": "دوباره تلاش کنید"
+          },
+          "badge-active": "فعال",
+          "badge-cooldown": "وقفه",
+          "level": "سطح",
+          "points": "امتیاز",
+          "duration": "مدت",
+          "upgrade": "ارتقاء",
+          "activate": "فعال کردن",
+          "active": "فعال",
+          "cooldown": "وقفه",
+          "disable-already-active": "بوستر قبلا فعال شده",
+          "disable-on-cooldown": "بوستر در حال وقفه است",
+          "disable-not-enough-points": "امتیاز کافی نیست",
+          "disable-start-mining-first": "اول باید استخراج را شروع کنی",
+          "speed": "ارتقاء توربوی روزانه",
+          "power": "ارتقاء سرعت ثابت",
+          "fortune": "گردونه بخت"
+        },
+        "mini-games-tab": {}
+      },
+      "leaderboat-tab": {},
+      "wallet-tab": {}
+    },
+    "navbar": {
+      "home": "خانه",
+      "miner": "ماینر",
+      "setting": "تنظیمات"
     }
   }
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,7 +25,7 @@ import { Copy, ExternalLink, Users, Coins, Loader2 } from "lucide-react";
 import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
 
-export default function referralTab({
+export default function TabReferrals({
   dictionary,
   lang,
 }: {
@@ -59,7 +58,6 @@ export default function referralTab({
       toast({
         title: `${dictionary["toast-success-copy"].title}`,
         description: `${dictionary["toast-success-copy"].description}`,
-        variant: "destructive",
       });
     } catch (error) {
       // Fallback: Focus and select the input field for manual copy
@@ -115,7 +113,7 @@ export default function referralTab({
   const referrals = data?.referrals || [];
 
   return (
-    <Card className='w-full max-w-4xl mx-auto'>
+    <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader className='border-b'>
         {/* <CardTitle className='text-2xl font-bold'>{dictionary["header-title"]}</CardTitle> */}
         <CardDescription>{dictionary["header-description"]}</CardDescription>

@@ -24,106 +24,8 @@ export default function MinerContent({
   dictionary: Awaited<ReturnType<typeof getDictionary>>["miner"];
   lang: Locale;
 }) {
-  const initTelegramData = useInitData();
-  const telegramId = initTelegramData?.user?.id;
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("mine");
-  const [isMining, setIsMining] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [score, setScore] = useState(0);
-  const [scope, animate] = useAnimate();
   const [level, setLevel] = useState(1);
-
-  // Fetch user data
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["user"],
-    queryFn: async () => {
-      const response = await fetch(`/api/users/${telegramId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-      return response.json();
-    },
-    enabled: !!telegramId,
-  });
-
-  const calculateLevel = useCallback((currentScore: number) => {
-    let currentLevel = 1;
-    for (let i = 0; i < levelThresholds.length; i++) {
-      if (currentScore >= levelThresholds[i]) {
-        currentLevel = i + 1;
-      }
-    }
-    return currentLevel;
-  }, []);
-
-  // Set data after fetching user info
-  useEffect(() => {
-    if (data && data.success) {
-      const userData = data.user;
-      setIsMining(userData.isMining);
-      setTimeRemaining(userData.timeRemaining || 0);
-      setProgress(1 - userData.timeRemaining / (4 * 60 * 60));
-      setScore(userData.score || 0);
-
-      const userLevel = calculateLevel(userData.score || 0);
-      setLevel(userLevel);
-    }
-  }, [data, calculateLevel]);
-
-  const updateLocalScoreAndTime = useCallback(() => {
-    if (isMining) {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          // Time has reached 0, trigger refetch
-          refetch(); // Refetch user data
-          return 0; // Reset time remaining
-        }
-        return prev - 1; // Decrease timeRemaining by 1 second
-      });
-
-      setScore((prev) => {
-        if (timeRemaining > 0) {
-          const newScore = prev + (1 * data?.data?.miningSpeed || 1); // Increment score based on mining speed
-
-          // Update level based on the new score
-          const newLevel = calculateLevel(newScore);
-          setLevel(newLevel);
-
-          return newScore;
-        }
-
-        // Return the previous score if timeRemaining is 0
-        return prev;
-      });
-    }
-  }, [isMining, data, calculateLevel, refetch, timeRemaining]);
-
-  // Timer to update local time and score
-  useEffect(() => {
-    const interval = setInterval(updateLocalScoreAndTime, 1000);
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [updateLocalScoreAndTime]);
-
-  // Handle mining click
-  const handleClick = async () => {
-    try {
-      const response = await fetch(`/api/users/${telegramId}`, {
-        method: "PATCH", // Use PATCH for mining action
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.ok) {
-        // Refetch data to update the mining status
-        queryClient.invalidateQueries({ queryKey: ["user"] });
-      }
-    } catch (error) {
-      console.error("Mining failed", error);
-    }
-  };
 
   return (
     <div className='min-h-screen flex flex-col'>
@@ -147,16 +49,7 @@ export default function MinerContent({
         </TabsList>
 
         <TabsContent value='mine' className='flex-1 mt-4'>
-          <TabMine
-            // isMining={isMining}
-            // progress={progress}
-            // timeRemaining={timeRemaining}
-            // handleClick={handleClick}
-            // scope={scope}
-            // currentScore={score}
-            // dictionary={dictionary.tabs["mine-tab"]}
-            telegramId={telegramId || 0}
-          />
+          <TabMine dictionary={dictionary.tabs["mine-tab"]} />
         </TabsContent>
         <TabsContent value='earn' className='flex-1 mt-4'>
           <TabEarn dictionary={dictionary.tabs["earn-tab"]} lang={lang} />

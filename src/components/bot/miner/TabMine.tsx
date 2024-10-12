@@ -4,12 +4,23 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { User } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { fetchUserData, formatTimeMS } from "@/lib/utils";
-import { ArrowUpCircle } from "lucide-react";
-import FlipCounter from "./FlipNumber";
+import { Clock, Zap, ArrowUpCircle, Loader2 } from "lucide-react";
+import { useInitData } from "@telegram-apps/sdk-react";
+import { getDictionary } from "@/get-dictionary";
 
-const startMining = async (telegramId: number): Promise<User> => {
+const startMining = async (
+  telegramId: number | undefined
+): Promise<{ user: User }> => {
+  if (!telegramId) throw new Error("Telegram Id not provided");
+
   const response = await fetch(`/api/users/${telegramId}`, {
     method: "PATCH",
     headers: {
@@ -20,46 +31,55 @@ const startMining = async (telegramId: number): Promise<User> => {
     throw new Error("Failed to start mining");
   }
   const data = await response.json();
-  return data.user;
+  return data;
 };
 
-export default function TabMine({ telegramId }: { telegramId: number }) {
+export default function TabMine({
+  dictionary,
+}: {
+  dictionary: Awaited<
+    ReturnType<typeof getDictionary>
+  >["miner"]["tabs"]["mine-tab"];
+}) {
+  const initTelData = useInitData();
+  const telegramId = initTelData?.user?.id;
   const [localScore, setLocalScore] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isMining, setIsMining] = useState(false);
   const queryClient = useQueryClient();
 
-  const {
-    data: userData,
-    isLoading,
-    isError,
-  } = useQuery<{ user: User }>({
+  const { data, isLoading, isError, refetch } = useQuery<{ user: User }>({
     queryKey: ["user"],
     queryFn: () => fetchUserData(telegramId),
-    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchInterval: 60000, // Refetch every 60 seconds
   });
 
   const mutation = useMutation({
-    mutationFn: async () => startMining(telegramId),
+    mutationFn: () => startMining(telegramId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+    onError: (error) => {
+      console.error("Mutation error:", error);
     },
   });
 
   useEffect(() => {
-    if (userData?.user) {
-      setLocalScore(userData.user.score ?? 0);
-      setTimeRemaining(userData.user.timeRemaining ?? 0);
+    if (data?.user) {
+      setLocalScore(data.user.score ?? 0);
+      setTimeRemaining(data.user.timeRemaining ?? 0);
+      setIsMining(data.user.isMining ?? false);
     }
-  }, [userData]);
+  }, [data]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (userData?.user?.isMining) {
+    if (isMining) {
       const updateInterval = 100; // Update every 100 ms
       interval = setInterval(() => {
         const effectiveSpeed =
-          userData.user.effectiveSpeed || userData.user.miningSpeed || 1;
+          data?.user?.effectiveSpeed || data?.user?.miningSpeed || 1;
         const scoreIncrement = (effectiveSpeed * 0.001 * updateInterval) / 1000; // Points per millisecond
         setLocalScore((prev) => prev + scoreIncrement);
         setTimeRemaining((prev) => Math.max(0, prev - updateInterval));
@@ -67,93 +87,117 @@ export default function TabMine({ telegramId }: { telegramId: number }) {
     }
 
     return () => clearInterval(interval);
-  }, [userData]);
+  }, [isMining, data]);
 
-  if (isLoading) return <div className='text-center p-4'>Loading...</div>;
-  if (isError)
+  if (isLoading) {
     return (
-      <div className='text-center p-4 text-red-500'>
-        Error fetching user data
+      <div className='flex items-center justify-center h-full'>
+        <Loader2 className='h-8 w-8 animate-spin' />
       </div>
     );
+  }
+
+  if (isError) {
+    return (
+      <Card className='w-full max-w-3xl mx-auto'>
+        <CardHeader>
+          <CardDescription>{dictionary.error.message}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={() => refetch()}>
+            {dictionary.error["try-again-button"]}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const miningDuration = 4 * 60 * 60 * 1000; // 4 hours in ms
   const progress = ((miningDuration - timeRemaining) / miningDuration) * 100;
 
-  const baseMiningSpeed = userData?.user?.miningSpeed || 1;
-  const effectiveSpeed = userData?.user?.effectiveSpeed || baseMiningSpeed;
-  const boostMultiplier = effectiveSpeed / baseMiningSpeed;
+  const baseMiningSpeed =
+    Number(data?.user?.miningSpeed) +
+      Number(data?.user?.activeBoosts?.power?.multiplier) || 1;
+  const effectiveSpeed = data?.user?.effectiveSpeed || baseMiningSpeed;
+  const boostMultiplier =
+    (data?.user?.effectiveSpeed &&
+      data?.user?.effectiveSpeed -
+        Number(data?.user?.activeBoosts?.power?.multiplier)) ||
+    0;
 
   return (
-    <Card className='w-full max-w-md mx-auto'>
-      <CardHeader>
-        <CardTitle className='text-2xl font-bold text-center'>
-          Mining Dashboard
-        </CardTitle>
-      </CardHeader>
+    <Card className='w-full max-w-3xl mx-auto'>
       <CardContent className='space-y-6'>
         <div className='text-center'>
-          {localScore.toFixed(4)}
-          <p className='text-sm text-muted-foreground mt-2'>Current Score</p>
+          <h1 className='text-5xl font-bold'>{localScore.toFixed(4)}</h1>
+          <p className='text-sm text-muted-foreground mt-1'>
+            {dictionary["total-score"]}
+          </p>
         </div>
-
         <div className='relative flex items-center justify-center'>
-          <svg className='w-48 h-48 transform -rotate-90'>
+          <svg className='w-40 h-40 -rotate-90'>
             <circle
-              className='text-muted-foreground'
-              strokeWidth='4'
-              stroke='currentColor'
+              className='text-muted stroke-current'
+              strokeWidth='8'
               fill='transparent'
-              r='70'
-              cx='96'
-              cy='96'
+              r='72'
+              cx='80'
+              cy='80'
             />
             <circle
-              className='text-primary'
-              strokeWidth='4'
-              strokeDasharray={2 * Math.PI * 70} // circumference of circle
+              className='text-primary stroke-current'
+              strokeWidth='8'
+              strokeDasharray={2 * Math.PI * 72}
               strokeDashoffset={
-                2 * Math.PI * 70 - (progress / 100) * 2 * Math.PI * 70
+                2 * Math.PI * 72 - (progress / 100) * 2 * Math.PI * 72
               }
               strokeLinecap='round'
-              stroke='currentColor'
               fill='transparent'
-              r='70'
-              cx='96'
-              cy='96'
+              r='72'
+              cx='80'
+              cy='80'
             />
           </svg>
-          <div className='absolute text-center'>
-            <p className='text-2xl font-bold'>
-              {formatTimeMS(timeRemaining / 1000)}
+          <div className='absolute inset-0 flex flex-col items-center justify-center text-center'>
+            <p className='flex gap-1 items-center justify-center text-xl font-semibold'>
+              <Clock className='h-6 w-6' /> {formatTimeMS(timeRemaining / 1000)}
             </p>
-            <p className='text-xs text-muted-foreground'>Remaining</p>
+            <p className='text-xs text-muted-foreground'>
+              {dictionary["time-remaining"]}
+            </p>
           </div>
         </div>
-
-        <div className='text-center space-y-2'>
-          <p className='text-sm font-medium'>
-            Mining Speed: {effectiveSpeed} (
-            {(effectiveSpeed * 0.001).toFixed(4)} points/s)
-          </p>
-          {boostMultiplier > 1 && (
-            <p className='text-sm text-muted-foreground'>
-              <ArrowUpCircle className='inline-block w-4 h-4 mr-1' />
-              Speed Boost: x{boostMultiplier.toFixed(2)}
+        <div className='grid grid-cols-2 gap-4 text-center'>
+          <div className='space-y-1'>
+            <Zap className='h-6 w-6 mx-auto text-yellow-400' />
+            <p className='text-lg font-semibold'>
+              {baseMiningSpeed.toFixed(2)}
             </p>
-          )}
+            <p className='text-xs text-muted-foreground'>
+              {dictionary["mining-speed"]}
+            </p>
+          </div>
+          <div className='space-y-1'>
+            <ArrowUpCircle className='h-6 w-6 mx-auto text-green-400' />
+            <p className='text-lg font-semibold'>
+              {boostMultiplier.toFixed(2)}
+            </p>
+            <p className='text-xs text-muted-foreground'>
+              {dictionary["speed-boost"]}
+            </p>
+          </div>
         </div>
 
         <Button
           onClick={() => mutation.mutate()}
-          disabled={userData?.user?.isMining || mutation.isPending}
+          disabled={isMining || mutation.isPending}
           className='w-full'
         >
-          {userData?.user?.isMining
-            ? "Mining in Progress"
+          {isMining
+            ? `${dictionary["button-progress"]}`
             : mutation.isPending
-            ? "Starting..."
-            : "Start Mining"}
+            ? `${dictionary["button-pending"]}...`
+            : `${dictionary["button-start"]}`}
         </Button>
       </CardContent>
     </Card>

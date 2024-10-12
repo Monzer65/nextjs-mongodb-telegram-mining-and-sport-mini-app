@@ -14,7 +14,7 @@ export default function TabWallet() {
   const wallet = useTonWallet();
 
   return (
-    <Card>
+    <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader>
         <CardTitle>Wallet</CardTitle>
         <CardDescription>

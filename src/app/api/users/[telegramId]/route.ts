@@ -1,6 +1,6 @@
 // app/api/users/[telegramId]/route.ts
 import { connectToDatabase } from "@/lib/mongodb";
-import { ActiveBoosts, BoosterCooldowns, BoosterId, User } from "@/lib/types";
+import { ActiveBoosts, BoosterCooldowns, User } from "@/lib/types";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -25,8 +25,6 @@ export async function GET(
 
     const FOUR_HOURS = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
     const now = Date.now(); // Current timestamp in milliseconds
-
-    // Safe handling for lastMiningStart and lastScoreUpdate (they could be null)
     const lastMiningStart = user.lastMiningStart ?? 0; // Fallback to 0 if null
     const lastScoreUpdate = user.lastScoreUpdate ?? now; // Fallback to current time if null
 
@@ -49,31 +47,31 @@ export async function GET(
     let effectiveSpeed = user.miningSpeed;
 
     Object.entries(activeBoosts).forEach(([boostType, boost]) => {
-      if (boost && now < boost.expiresAt) {
+      if (boost.expiresAt && now < boost.expiresAt) {
         if (boostType === "speed") {
           effectiveSpeed *= boost.multiplier;
         }
-        if (boostType === "power") {
+        if (boostType === "fortune") {
           effectiveSpeed *= boost.multiplier;
         }
-        if (boostType === "luck") {
-          effectiveSpeed *= boost.multiplier;
-        }
-        // Add other boost types here if needed
+      }
+      if (boostType === "power") {
+        effectiveSpeed *= boost.multiplier;
       }
     });
 
-    // Update newScore if the user is still mining
-    // Update newScore if the user is still mining
+    // Calculate accumulated score for completed 4-hour sessions
+    const completedSessions = Math.floor((now - lastScoreUpdate) / FOUR_HOURS);
+    if (completedSessions > 0) {
+      const accumulatedScore =
+        completedSessions * FOUR_HOURS * effectiveSpeed * 0.001;
+      newScore += accumulatedScore;
+    }
+
+    // Update newScore if the user is still mining in the current session
     if (isMining) {
-      // Calculate the elapsed time in milliseconds since the last score update
-      const miningTimeInMilliseconds = now - lastScoreUpdate;
-
-      // Convert the elapsed time to seconds
-      const miningTimeInSeconds = miningTimeInMilliseconds / 1000; // Convert milliseconds to seconds
-
-      // Update newScore based on effective speed and elapsed time
-      newScore += miningTimeInSeconds * effectiveSpeed * 0.001;
+      const currentSessionTime = (now - lastScoreUpdate) % FOUR_HOURS;
+      newScore += (currentSessionTime * effectiveSpeed * 0.001) / 1000; // Convert to seconds
     }
 
     // Prepare updated user data
@@ -89,7 +87,10 @@ export async function GET(
     // Remove expired boosts
     const updatedActiveBoosts: ActiveBoosts = {};
     Object.entries(activeBoosts).forEach(([boostType, boost]) => {
-      if (boost && boost.expiresAt > now) {
+      if (
+        boostType === "power" ||
+        (boost && boost.expiresAt && boost.expiresAt > now)
+      ) {
         updatedActiveBoosts[boostType] = boost;
       }
     });
@@ -209,6 +210,7 @@ export async function POST(
   }
 }
 
+// start mining api
 export async function PATCH(
   request: Request,
   { params }: { params: { telegramId: string } }
@@ -227,13 +229,26 @@ export async function PATCH(
       );
     }
 
-    // Start mining: update lastMiningStart to current time
+    if (user.isMining == true) {
+      return NextResponse.json(
+        { success: false, error: "User is already mining" },
+        { status: 404 }
+      );
+    }
+
     const now = Date.now();
+    const FOUR_HOURS = 4 * 60 * 60 * 1000;
+    const isMining = true;
+    const lastMiningStart = now;
+    const lastScoreUpdate = now;
+    const timeRemaining = FOUR_HOURS - lastMiningStart;
+
     const updatedUser = {
       ...user,
-      lastMiningStart: now,
-      lastScoreUpdate: now,
-      isMining: true,
+      lastMiningStart,
+      lastScoreUpdate,
+      isMining,
+      timeRemaining,
     };
 
     await db
@@ -241,7 +256,7 @@ export async function PATCH(
       .updateOne({ telegramId }, { $set: updatedUser });
 
     return NextResponse.json(
-      { success: true, data: updatedUser },
+      { success: true, user: updatedUser },
       { status: 200 }
     );
   } catch (error) {

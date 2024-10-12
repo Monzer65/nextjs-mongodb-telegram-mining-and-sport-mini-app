@@ -26,17 +26,24 @@
         "wallet": "هەمانە"
       },
       "mine-tab": {
-        "title": "ئامادەی هەڵکۆڵینی بۆ دەوڵەمەندی",
-        "title-progress": "خەریکی هەڵکەندنە",
+        "error": {
+          "message": "هەڵەیەک ڕوویداوە لەکاتی بارکردنی دراوەکانی بەکارهێنەر",
+          "try-again-button": "دووبارە هەوڵ بدە"
+        },
+        "total-score": "کۆی خاڵەکان",
+        "time-remaining": "کاتی ماوە",
+        "mining-speed": "خێرایی هەڵکۆڵین",
+        "speed-boost": "بەهێزکەرەوەی خێرایی",
+        "button-start": "دەست پێ بکە",
+        "button-pending": "دەستی پێ دەکا",
+        "button-progress": "هەڵکۆڵین بەردەوامە",
         "description": "خۆت تەیار کە بۆ دەرخستنی خەزێنە شاردراوەکان",
-        "description-progress": "ئیشی هەڵکۆڵینت دەستی پێکردوە. چاوەڕێ بکە تا وەکو خەڵاتەکانت کۆ دەبنەوە",
-        "start-button": "دەستی پێبکە",
-        "button-progress": "حەوسەڵە بکە"
+        "description-progress": "ئیشی هەڵکۆڵینت دەستی پێکردوە. چاوەڕێ بکە تا وەکو خەڵاتەکانت کۆ دەبنەوە"
       },
       "earn-tab": {
         "titles": {
           "tasks": "ئەرکەکان",
-          "boost": "زیادکردن",
+          "boost": "بەهێزکردن",
           "referrals": "ئاماژە پێکراوەکان",
           "mini-games": "یاریە بچووکەکان"
         },
@@ -93,8 +100,45 @@
           "table-header-col-join-date": "رۆژی بەشداربوون",
           "footer-text": "بانگهێشتی هاوڕێی زیاتر بکە بۆ بەدەستهێنانی خەڵاتی زۆرتر!"
         },
-        "boosts-tab": {}
-      }
+        "boosts-tab": {
+          "toast-success-active": {
+            "title": "بەهێز کەرەوەکە چالاک کرایەوە",
+            "description": "بەهێز کەرەوەکە سەرکەوتووانە چالاک کرایەوە"
+          },
+          "toast-failed-active": {
+            "title": "هەڵە ڕویدا",
+            "description": "چالاککردن شکستی هێنا. دواتر هەوڵبدەرەوە"
+          },
+          "error": {
+            "message": "هەڵەیەک ڕوویداوە لەکاتی بارکردنی بەهێزکەرەوەکان",
+            "try-again-button": "دووبارە هەوڵ بدە"
+          },
+          "badge-active": "چالاک",
+          "badge-cooldown": "پشوودان",
+          "level": "قۆناغ",
+          "points": "خاڵ",
+          "duration": "ماوە",
+          "upgrade": "بەرزکردنەوە",
+          "activate": "چالاک کردن",
+          "active": "چالاک",
+          "cooldown": "پشوودان",
+          "disable-already-active": "بەهێزکەرەوەکە جارێ چالاکە",
+          "disable-on-cooldown": "بەهێزکەرەوەکە لە کاتی پشوودانە",
+          "disable-not-enough-points": "خاڵەکانت بەس نیە",
+          "disable-start-mining-first": "ئەبێ لە پێشا دەس بە هەڵکۆڵین بکەیت",
+          "speed": "بەهێزکەرەوەی ڕۆژانە",
+          "power": "بەهێزکەرەوەی جێگیر",
+          "fortune": "چەرخی بەختەوەری"
+        },
+        "mini-games-tab": {}
+      },
+      "leaderboat-tab": {},
+      "wallet-tab": {}
+    },
+    "navbar": {
+      "home": "ماڵەوە",
+      "miner": "ماینەر",
+      "setting": "ڕێکخستن"
     }
   }
 }

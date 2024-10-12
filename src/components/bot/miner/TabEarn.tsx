@@ -15,6 +15,7 @@ import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
 import TabReferrals from "./TabReferrals";
 import TabBoosts from "./TabBoosts";
+import TabGames from "./TabGames";
 
 export default function TabEarn({
   dictionary,
@@ -48,37 +49,10 @@ export default function TabEarn({
         <TabReferrals dictionary={dictionary["referrals-tab"]} lang={lang} />
       </TabsContent>
       <TabsContent value='boosts'>
-        <TabBoosts
-        // dictionary={dictionary["boosts-tab"]}
-        />
+        <TabBoosts dictionary={dictionary["boosts-tab"]} lang={lang} />
       </TabsContent>
       <TabsContent value='mini-games'>
-        <Card>
-          <CardHeader>
-            <CardTitle>Special Rewards</CardTitle>
-            <CardDescription>Claim special rewards and bonuses</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-4'>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <Gift className='w-4 h-4' />
-                  <span>Daily Bonus</span>
-                </div>
-                <Button size='sm'>Claim 100 tokens</Button>
-              </div>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center gap-2'>
-                  <Gift className='w-4 h-4' />
-                  <span>Level Up Reward</span>
-                </div>
-                <Button size='sm' disabled>
-                  Claim at Level 5
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TabGames dictionary={dictionary["mini-games-tab"]} lang={lang} />
       </TabsContent>
     </Tabs>
   );

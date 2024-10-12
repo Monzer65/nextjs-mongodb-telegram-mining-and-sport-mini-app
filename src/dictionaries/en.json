@@ -26,12 +26,19 @@
         "wallet": "Wallet"
       },
       "mine-tab": {
-        "title": "Ready to Dig for Riches?",
-        "title-progress": "Mining in Progress",
+        "error": {
+          "message": "An error occurred while loading user data",
+          "try-again-button": "Try again"
+        },
+        "total-score": "Total score",
+        "time-remaining": "Time Remaining",
+        "mining-speed": "Mining Speed",
+        "speed-boost": "Speed Boost",
+        "button-start": "start mining",
+        "button-pending": "starting",
+        "button-progress": "Mining in Progress",
         "description": "Prepare yourself to uncover hidden rewards. Start mining now and let the riches flow!",
-        "description-progress": "Your mining operation is underway. Stay tuned as your rewards accumulate",
-        "start-button": "Begin Mining Adventure",
-        "button-progress": "Sit tight"
+        "description-progress": "Your mining operation is underway. Stay tuned as your rewards accumulate"
       },
       "earn-tab": {
         "titles": {
@@ -78,8 +85,8 @@
             "description": "Copying to clipboard failed. Please try manually selecting and copying the link"
           },
           "error": {
-            "message": "An error occurred while loading the referrals",
-            "try-again-button": "Ary again"
+            "message": "An error occurred while loading referrals",
+            "try-again-button": "Try again"
           },
           "header-title": "Referral Program",
           "header-description": "Invite friends and earn rewards",
@@ -93,8 +100,45 @@
           "table-header-col-join-date": "Join Date",
           "footer-text": "Invite more friends to earn additional rewards!"
         },
-        "boosts-tab": {}
-      }
+        "boosts-tab": {
+          "toast-success-active": {
+            "title": "Booster Activated",
+            "description": "Booster has been activated successfully"
+          },
+          "toast-failed-active": {
+            "title": "Error",
+            "description": "Activation failed. try again later"
+          },
+          "error": {
+            "message": "An error occurred while loading boosters",
+            "try-again-button": "Try again"
+          },
+          "badge-active": "Active",
+          "badge-cooldown": "Cooldown",
+          "level": "level",
+          "points": "points",
+          "duration": "Duration",
+          "upgrade": "Upgrade",
+          "activate": "Activate",
+          "active": "Active",
+          "cooldown": "Cooldown",
+          "disable-already-active": "Booster is already active",
+          "disable-on-cooldown": "Booster is on cooldown",
+          "disable-not-enough-points": "Not enough points",
+          "disable-start-mining-first": "Start mining to activate boosters",
+          "speed": "Daily Turbo Boost",
+          "power": "Mining Efficiency Upgrade",
+          "fortune": "Fortune Spin"
+        },
+        "mini-games-tab": {}
+      },
+      "leaderboat-tab": {},
+      "wallet-tab": {}
+    },
+    "navbar": {
+      "home": "Home",
+      "miner": "Miner",
+      "setting": "Setting"
     }
   }
 }

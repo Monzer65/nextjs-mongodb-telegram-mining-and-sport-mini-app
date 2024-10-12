@@ -11,9 +11,12 @@ export default async function MinerPage({
   const dictionary = await getDictionary(lang);
 
   return (
-    <>
+    <div>
       <MinerContent dictionary={dictionary["miner"]} lang={lang} />
-      <NavigationTabBar />
-    </>
+      <NavigationTabBar
+        dictionary={dictionary["miner"]["navbar"]}
+        lang={lang}
+      />
+    </div>
   );
 }
