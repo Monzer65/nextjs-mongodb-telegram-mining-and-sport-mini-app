@@ -34,6 +34,8 @@
         "time-remaining": "کاتی ماوە",
         "mining-speed": "خێرایی هەڵکۆڵین",
         "speed-boost": "بەهێزکەرەوەی خێرایی",
+        "permanent-speed": "خێرایی",
+        "temporary-speed": "هێزی کاتی",
         "button-start": "دەست پێ بکە",
         "button-pending": "دەستی پێ دەکا",
         "button-progress": "هەڵکۆڵین بەردەوامە",
@@ -128,6 +130,7 @@
           "badge-active": "چالاکە",
           "badge-cooldown": "لە کاتی پشوودانە",
           "level": "قۆناغ",
+          "max_level": "دوایین قۆناغ",
           "points": "خاڵ",
           "duration": "ماوە",
           "upgrade": "بەرزی کەرەوە",
@@ -144,10 +147,45 @@
           "power": "بەهێزکەرەوەی جێگیر",
           "fortune": "چەرخی بەختەوەری"
         },
-        "mini-games-tab": {}
+        "mini-games-tab": {
+          "mini_games": "یاریە بچوکەکان",
+          "header_description": "بە یاریکردن داوای خەڵاتو پاداشتی تایبەت بکە",
+          "back_button": "گەڕانەوە بۆ لیستی یارییەکان",
+          "play": "کایە بکە",
+          "sudoku": {
+            "name": "سودۆکو",
+            "description": "یاری سودۆکو"
+          },
+          "chess": {
+            "name": "شەترەنج",
+            "description": ""
+          }
+        }
       },
-      "leaderboat-tab": {},
-      "wallet-tab": {}
+      "leaderboard-tab": {
+        "error": {
+          "message": "هەڵەیەک ڕوویداوە لەکاتی بارکردنی تەختەی پێشەنگەکان",
+          "try-again-button": "دووبارە هەوڵ بدە"
+        },
+        "leaderboard": "پێشەنگەکان",
+        "header_description": "یاریزانە سەرەکیەکان بەپێی خاڵ",
+        "No_players_found": "هیچ یاریزانێک نەدۆزرایەوە",
+        "rank": "پلە",
+        "player": "یاریزان",
+        "score": "خاڵ",
+        "not_on_leaderboard": "تۆ هێشتا لەسەر تەختەی پێشەنگەکان نیت",
+        "your_rank": "پلەکەت",
+        "your_score": "نمرەکەت"
+      },
+      "wallet-tab": {
+        "wallet": "هەمانە",
+        "header_description_no_wallet": "هەمانەکەت پەیوەند بکە",
+        "header_description_available_wallet": "زانیاری هەمانەکەت",
+        "account": "هەژمار",
+        "address": "ناونیشان",
+        "chain": "زنجیرە",
+        "public_key": "کلیلی گشتی"
+      }
     },
     "navbar": {
       "home": "ماڵەوە",

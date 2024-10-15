@@ -34,6 +34,8 @@
         "time-remaining": "Time Remaining",
         "mining-speed": "Mining Speed",
         "speed-boost": "Speed Boost",
+        "permanent-speed": "Speed",
+        "temporary-speed": "temporary boost",
         "button-start": "start mining",
         "button-pending": "starting",
         "button-progress": "Mining in Progress",
@@ -128,6 +130,7 @@
           "badge-active": "Active",
           "badge-cooldown": "Cooldown",
           "level": "level",
+          "max_level": "max level",
           "points": "points",
           "duration": "Duration",
           "upgrade": "Upgrade",
@@ -144,10 +147,45 @@
           "power": "Mining Efficiency Upgrade",
           "fortune": "Fortune Spin"
         },
-        "mini-games-tab": {}
+        "mini-games-tab": {
+          "mini_games": "Mini Games",
+          "header_description": "Claim special rewards and bonuses by playing games",
+          "back_button": "Back to game list",
+          "play": "Play Now",
+          "sudoku": {
+            "name": "Sudoku",
+            "description": ""
+          },
+          "chess": {
+            "name": "Chess",
+            "description": ""
+          }
+        }
       },
-      "leaderboat-tab": {},
-      "wallet-tab": {}
+      "leaderboard-tab": {
+        "error": {
+          "message": "An error occurred while loading leaderboard",
+          "try-again-button": "Try again"
+        },
+        "leaderboard": "Leaderboard",
+        "header_description": "Top players by score",
+        "No_players_found": "No players found",
+        "rank": "Rank",
+        "player": "Player",
+        "score": "Score",
+        "not_on_leaderboard": "You are not on the leaderboard yet",
+        "your_rank": "Your Rank",
+        "your_score": "Your Score"
+      },
+      "wallet-tab": {
+        "wallet": "Wallet",
+        "header_description_no_wallet": "Connect your wallet",
+        "header_description_available_wallet": "Your wallet info",
+        "account": "Account",
+        "address": "Address",
+        "chain": "Chain",
+        "public_key": "Public Key"
+      }
     },
     "navbar": {
       "home": "Home",

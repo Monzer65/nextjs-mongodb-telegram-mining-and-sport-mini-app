@@ -20,6 +20,8 @@ import { Loader2, RefreshCcw } from "lucide-react";
 import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
 
+type Timestamp = number;
+
 const activateBooster = async (
   telegramId: number,
   boosterId: string
@@ -35,6 +37,34 @@ const activateBooster = async (
     throw new Error(errorData.error || "Failed to activate booster");
   }
   return response.json();
+};
+
+const calculateMultiplier = (
+  booster: Booster,
+  userBooster: UserBooster | undefined
+): number => {
+  if (typeof booster.multiplier === "function") {
+    return booster.multiplier();
+  }
+
+  if (booster.id === "power" && userBooster?.level !== undefined) {
+    return 1 + (booster.speedIncrement || 0) * userBooster.level;
+  }
+
+  return booster.multiplier as number;
+};
+
+const calculateBoosterCost = (
+  booster: Booster,
+  userBooster: UserBooster | undefined
+) => {
+  if (booster.id === "power" && userBooster) {
+    const nextLevel = (userBooster.level || 0) + 1;
+    return (
+      booster.cost * Math.pow(booster.upgradeCostFactor || 1.1, nextLevel - 1)
+    );
+  }
+  return booster.cost;
 };
 
 export default function TabBoosts({
@@ -78,7 +108,7 @@ export default function TabBoosts({
     },
   });
 
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<Timestamp>(Date.now());
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -111,83 +141,105 @@ export default function TabBoosts({
 
   const { user } = data;
   return (
-    <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-      {boosters.map((booster: Booster) => {
-        const activeBooster = user.boosters.activeBoosters.find(
-          (b) => b.id === booster.id
-        );
-        const cooldown = user.boosters.cooldowns[booster.id];
-        const cooldownDate = cooldown ? new Date(cooldown) : null;
-        const isActive =
-          activeBooster?.expiresAt &&
-          new Date(activeBooster.expiresAt).getTime() > now;
-        const isOnCooldown =
-          cooldownDate &&
-          cooldownDate.getTime() + booster.cooldownDuration! > now;
+    <Card className='w-full max-w-3xl mx-auto'>
+      <CardHeader className='border-b'>
+        <CardDescription>some descriptions</CardDescription>
+      </CardHeader>
+      <CardContent className='space-y-6 pt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        {boosters.map((booster: Booster) => {
+          const activeBooster = user.boosters.activeBoosters.find(
+            (b) => b.id === booster.id
+          );
+          const cooldown = user.boosters.cooldowns[booster.id];
+          const cooldownDate = cooldown ? new Date(cooldown) : null;
+          const isActive =
+            activeBooster?.expiresAt &&
+            new Date(activeBooster.expiresAt).getTime() > now;
+          const isOnCooldown =
+            cooldownDate &&
+            cooldownDate.getTime() + booster.cooldownDuration! > now;
 
-        let progress = 0;
-        if (isActive && activeBooster?.expiresAt) {
-          const duration =
-            new Date(activeBooster.expiresAt).getTime() -
-            new Date(activeBooster.lastUsed).getTime();
-          const timeRemaining =
-            new Date(activeBooster.expiresAt).getTime() - now;
-          progress = (timeRemaining / duration) * 100;
-        } else if (isOnCooldown && cooldownDate) {
-          const cooldownEnd =
-            cooldownDate.getTime() + booster.cooldownDuration!;
-          const timeRemaining = cooldownEnd - now;
-          progress = (timeRemaining / booster.cooldownDuration!) * 100;
-        }
+          let progress = 0;
+          if (isActive && activeBooster?.expiresAt) {
+            const duration =
+              new Date(activeBooster.expiresAt).getTime() -
+              new Date(activeBooster.lastUsed).getTime();
+            const timeRemaining =
+              new Date(activeBooster.expiresAt).getTime() - now;
+            progress = (timeRemaining / duration) * 100;
+          } else if (isOnCooldown && cooldownDate) {
+            const cooldownEnd =
+              cooldownDate.getTime() + booster.cooldownDuration!;
+            const timeRemaining = cooldownEnd - now;
+            progress = (timeRemaining / booster.cooldownDuration!) * 100;
+          }
 
-        return (
-          <Card key={booster.id}>
-            <CardHeader>
-              <CardTitle>
-                {booster.id === "speed" && dictionary.speed}
-                {booster.id === "power" && dictionary.power}
-                {booster.id === "fortune" && dictionary.fortune}
-              </CardTitle>
-              <CardDescription>
-                {booster.cost > 0
-                  ? `${dictionary.cost}: ${booster.cost}`
-                  : dictionary.free}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className='mb-2'>
-                {dictionary.multiplier}:{" "}
-                {typeof booster.multiplier === "function"
-                  ? `${dictionary.random} (1x - 3x)`
-                  : `${booster.multiplier}x`}
-              </p>
-              {isActive && (
-                <div className='mb-2'>
-                  <p>{dictionary.active_duration}</p>
-                  <Progress value={progress} className='mt-2' />
-                </div>
-              )}
-              {isOnCooldown && (
-                <div className='mb-2'>
-                  <p>{dictionary.cooldown}</p>
-                  <Progress value={progress} className='mt-2' />
-                </div>
-              )}
-              <Button
-                onClick={() => mutation.mutate({ boosterId: booster.id })}
-                disabled={isActive || isOnCooldown || mutation.isPending}
-                className='w-full mt-2'
-              >
-                {isActive
-                  ? dictionary.active
-                  : isOnCooldown
-                  ? dictionary.on_cooldown
-                  : dictionary.activate}
-              </Button>
-            </CardContent>
-          </Card>
-        );
-      })}
-    </div>
+          const userBooster = user.boosters[
+            booster.id as keyof typeof user.boosters
+          ] as UserBooster | undefined;
+          const multiplier = calculateMultiplier(booster, userBooster);
+          const level = userBooster?.level || 0;
+          const maxLevel = booster.maxLevel || Infinity;
+          const boosterCost = calculateBoosterCost(booster, userBooster);
+
+          return (
+            <Card key={booster.id}>
+              <CardHeader>
+                <CardTitle>
+                  {booster.id === "speed" && dictionary.speed}
+                  {booster.id === "power" && dictionary.power}
+                  {booster.id === "fortune" && dictionary.fortune}
+                </CardTitle>
+                <CardDescription>
+                  {boosterCost > 0
+                    ? `${dictionary.cost}: ${boosterCost}`
+                    : dictionary.free}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className='mb-2'>
+                  {dictionary.multiplier}: {multiplier.toFixed(2)}x
+                </p>
+                {booster.level !== undefined && (
+                  <p className='mb-2'>
+                    {dictionary.level}: {level} / {maxLevel}
+                  </p>
+                )}
+                {isActive && (
+                  <div className='mb-2'>
+                    <p>{dictionary.active_duration}</p>
+                    <Progress value={progress} className='mt-2' />
+                  </div>
+                )}
+                {isOnCooldown && (
+                  <div className='mb-2'>
+                    <p>{dictionary.cooldown}</p>
+                    <Progress value={progress} className='mt-2' />
+                  </div>
+                )}
+                <Button
+                  onClick={() => mutation.mutate({ boosterId: booster.id })}
+                  disabled={
+                    isActive ||
+                    isOnCooldown ||
+                    mutation.isPending ||
+                    (booster.id === "power" && level >= maxLevel)
+                  }
+                  className='w-full mt-2'
+                >
+                  {isActive
+                    ? dictionary.active
+                    : isOnCooldown
+                    ? dictionary.on_cooldown
+                    : booster.id === "power" && level >= maxLevel
+                    ? dictionary.max_level
+                    : dictionary.activate}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }

@@ -34,7 +34,7 @@ export async function POST(
     // Initialize boosters field if it doesn't exist
     if (!user.boosters) {
       user.boosters = {
-        power: { level: 0, multiplier: 1 },
+        power: { level: 0, multiplier: 1, lastUsed: new Date() },
         activeBoosters: [],
         cooldowns: {},
       };
@@ -65,11 +65,25 @@ export async function POST(
     switch (booster.id) {
       case "power":
         const nextLevel = user.boosters.power.level + 1;
+        const upgradeCost =
+          booster.cost *
+          Math.pow(booster.upgradeCostFactor || 1.1, nextLevel - 1);
+
         if (nextLevel <= (booster.maxLevel || Infinity)) {
+          if (user.score < upgradeCost) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: "Insufficient score to upgrade power booster",
+              },
+              { status: 400 }
+            );
+          }
           user.boosters.power.level = nextLevel;
           user.boosters.power.multiplier =
             1 + booster.speedIncrement! * nextLevel;
-          user.score -= booster.cost; // Deduct score after confirming upgrade
+          user.boosters.power.lastUsed = new Date();
+          user.score -= upgradeCost; // Deduct score after confirming upgrade
         } else {
           return NextResponse.json(
             { success: false, error: "Power booster already at max level" },

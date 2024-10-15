@@ -25,11 +25,10 @@ export default function MinerContent({
   lang: Locale;
 }) {
   const [activeTab, setActiveTab] = useState("mine");
-  const [level, setLevel] = useState(1);
 
   return (
     <div className='min-h-screen flex flex-col'>
-      <Header level={level} dictionary={dictionary.header} />
+      <Header dictionary={dictionary.header} />
 
       <Tabs
         value={activeTab}
@@ -55,10 +54,13 @@ export default function MinerContent({
           <TabEarn dictionary={dictionary.tabs["earn-tab"]} lang={lang} />
         </TabsContent>
         <TabsContent value='leaderboard' className='flex-1 mt-4'>
-          <TabLeaderboard />
+          <TabLeaderboard
+            dictionary={dictionary.tabs["leaderboard-tab"]}
+            lang={lang}
+          />
         </TabsContent>
         <TabsContent value='wallet' className='flex-1 mt-4'>
-          <TabWallet />
+          <TabWallet dictionary={dictionary.tabs["wallet-tab"]} lang={lang} />
         </TabsContent>
       </Tabs>
     </div>

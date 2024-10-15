@@ -8,17 +8,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getDictionary } from "@/get-dictionary";
+import { Locale } from "@/i18n-config";
 import { TonConnectButton, useTonWallet } from "@tonconnect/ui-react";
 
-export default function TabWallet() {
+export default function TabWallet({
+  dictionary,
+  lang,
+}: {
+  dictionary: Awaited<
+    ReturnType<typeof getDictionary>
+  >["miner"]["tabs"]["wallet-tab"];
+  lang: Locale;
+}) {
   const wallet = useTonWallet();
 
   return (
     <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader>
-        <CardTitle>Wallet</CardTitle>
+        {/* <CardTitle>{dictionary.wallet}</CardTitle> */}
         <CardDescription>
-          {!wallet ? "Connect your wallet" : "Your wallet info"}
+          {!wallet
+            ? `${dictionary.header_description_no_wallet}`
+            : `${dictionary.header_description_available_wallet}`}
         </CardDescription>
       </CardHeader>
       <CardContent className='pt-6'>
@@ -26,11 +38,14 @@ export default function TabWallet() {
           <TonConnectButton className='ton-connect-page__button' />
         ) : (
           <DisplayData
-            header='Account'
+            header={dictionary.account}
             rows={[
-              { title: "Address", value: wallet.account.address },
-              { title: "Chain", value: wallet.account.chain },
-              { title: "Public Key", value: wallet.account.publicKey },
+              { title: `${dictionary.address}`, value: wallet.account.address },
+              { title: `${dictionary.chain}`, value: wallet.account.chain },
+              {
+                title: `${dictionary.public_key}`,
+                value: wallet.account.publicKey,
+              },
             ]}
           />
         )}

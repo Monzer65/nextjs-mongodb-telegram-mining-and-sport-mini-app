@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -151,15 +149,15 @@ export default function SudokuGame() {
   return (
     <div
       dir='ltr'
-      className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-200 via-blue-200 to-pink-200 p-4'
+      className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-200 via-blue-200 to-pink-200 p-2 md:p-4'
     >
       {gameState === "selecting" && (
-        <div className='flex flex-col items-center space-y-6'>
-          <h2 className='text-3xl font-extrabold text-gray-800'>
+        <div className='flex flex-col items-center space-y-4 md:space-y-6'>
+          <h2 className='text-xl md:text-3xl font-extrabold text-gray-800'>
             Select Difficulty
           </h2>
           <Select onValueChange={selectDifficulty}>
-            <SelectTrigger className='w-[200px]'>
+            <SelectTrigger className='w-[150px] md:w-[200px]'>
               <SelectValue placeholder='Select Difficulty' />
             </SelectTrigger>
             <SelectContent>
@@ -172,10 +170,12 @@ export default function SudokuGame() {
       )}
 
       {(gameState === "playing" || gameState === "completed") && (
-        <div className='space-y-6'>
+        <div className='space-y-4 md:space-y-6'>
           <div className='flex justify-between items-center'>
-            <div className='text-xl font-semibold'>Time: {time}s</div>
-            <div className='text-xl font-semibold text-red-600'>
+            <div className='text-base md:text-xl font-semibold'>
+              Time: {time}s
+            </div>
+            <div className='text-base md:text-xl font-semibold text-red-600'>
               Mistakes: {mistakes}
             </div>
             <Button onClick={toggleFullScreen} className='rounded-full'>
@@ -183,12 +183,12 @@ export default function SudokuGame() {
             </Button>
           </div>
 
-          <div className='grid grid-cols-9 gap-0.5 bg-gray-300 p-2 rounded-lg shadow-md'>
+          <div className='grid grid-cols-9 gap-0.5 bg-gray-300 p-1 md:p-2 rounded-lg shadow-md'>
             {board.map((cell, index) => (
               <div
                 key={index}
                 className={clsx(
-                  "w-10 h-10 flex items-center justify-center bg-white text-lg rounded cursor-pointer shadow transition-colors duration-300",
+                  "w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-white text-sm md:text-lg rounded cursor-pointer shadow transition-colors duration-300",
                   {
                     "bg-red-200": mistakeHighlight === index,
                     "bg-blue-100":
@@ -210,12 +210,12 @@ export default function SudokuGame() {
             ))}
           </div>
 
-          <div className='grid grid-cols-9 gap-2'>
+          <div className='grid grid-cols-9 gap-1 md:gap-2'>
             {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((num) => (
               <Button
                 key={num}
                 onClick={() => handleNumberInput(num)}
-                className='text-lg'
+                className='text-sm md:text-lg'
               >
                 {num}
               </Button>
@@ -223,9 +223,11 @@ export default function SudokuGame() {
           </div>
 
           {gameState === "completed" && (
-            <div className='text-center space-y-4'>
-              <h2 className='text-3xl font-extrabold'>Game Completed!</h2>
-              <p className='text-xl'>Your score: {score}</p>
+            <div className='text-center space-y-2 md:space-y-4'>
+              <h2 className='text-2xl md:text-3xl font-extrabold'>
+                Game Completed!
+              </h2>
+              <p className='text-lg md:text-xl'>Your score: {score}</p>
               <Button onClick={saveScore}>Save Score</Button>
             </div>
           )}

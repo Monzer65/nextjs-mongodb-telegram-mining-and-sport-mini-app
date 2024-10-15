@@ -21,7 +21,7 @@
     "tabs": {
       "titles": {
         "mine": "ماین",
-        "earn": "دخل",
+        "earn": "امتیاز‌ بیشتر",
         "leaderboard": "تابلو امتیازات",
         "wallet": "کیف پول"
       },
@@ -34,6 +34,8 @@
         "time-remaining": "زمان باقی‌مانده",
         "mining-speed": "سرعت استخراج",
         "speed-boost": "سرعت افزایشی",
+        "permanent-speed": "سرعت",
+        "temporary-speed": "بوست موقت",
         "button-start": "شروع کن به استخراج",
         "button-pending": "در‌حال شروع",
         "button-progress": "در حال استخراج",
@@ -128,6 +130,7 @@
           "badge-active": "فعال",
           "badge-cooldown": "وقفه",
           "level": "سطح",
+          "max_level": "سطح نهایی",
           "points": "امتیاز",
           "duration": "مدت",
           "upgrade": "ارتقاء",
@@ -144,10 +147,45 @@
           "power": "ارتقاء سرعت ثابت",
           "fortune": "گردونه بخت"
         },
-        "mini-games-tab": {}
+        "mini-games-tab": {
+          "mini_games": "بازی‌های کوچک",
+          "header_description": "با بازی کردن، جوایز ویژه‌ای را دریافت کنید",
+          "back_button": "بازگشت به لیست بازی‌ها",
+          "play": "الان بازی کن",
+          "sudoku": {
+            "name": "سودوکو",
+            "description": ""
+          },
+          "chess": {
+            "name": "شطرنج",
+            "description": ""
+          }
+        }
       },
-      "leaderboat-tab": {},
-      "wallet-tab": {}
+      "leaderboard-tab": {
+        "error": {
+          "message": "خطایی در بارگزاری لیدربوردتابلوی امتیازات رخ داده",
+          "try-again-button": "دوباره تلاش کنید"
+        },
+        "leaderboard": "تابلوی امتیازات",
+        "header_description": "برترین بازیکنان براساس امتیاز",
+        "No_players_found": "هیچ بازیکنی یافت نشد",
+        "rank": "رتبه",
+        "player": "بازیکن",
+        "score": "امتیاز",
+        "not_on_leaderboard": "شما هنوز در تابلو امتیازات قرار نگرفته‌اید",
+        "your_rank": "رتبه شما",
+        "your_score": "امتیاز شما"
+      },
+      "wallet-tab": {
+        "wallet": "کیف پول",
+        "header_description_no_wallet": "کیف پولت را وصل کن",
+        "header_description_available_wallet": "اطلاعات کیف پولت",
+        "account": "حساب کاربری",
+        "address": "آدرس",
+        "chain": "زنجیره",
+        "public_key": "کلید عمومی"
+      }
     },
     "navbar": {
       "home": "خانه",

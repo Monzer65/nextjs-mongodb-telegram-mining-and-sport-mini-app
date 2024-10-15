@@ -17,6 +17,7 @@ export const boosters: Booster[] = [
     maxLevel: 20, // Total of 20 levels
     upgradeCostFactor: 1.5, // Exponential increase in cost
     speedIncrement: 0.05, // 5% increase per level
+    cooldownDuration: 14400000,
   },
   {
     id: "fortune",

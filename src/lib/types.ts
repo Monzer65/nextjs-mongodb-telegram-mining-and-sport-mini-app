@@ -9,13 +9,14 @@ export type User = {
   lastMiningStart: Timestamp;
   referredBy: number | null;
   referrals: string[];
-  level: string;
+  level: number;
   isMining: boolean;
   miningSpeed: number;
   boosters: {
     power: {
       level: number;
       multiplier: number;
+      lastUsed: Date;
     };
     activeBoosters: UserBooster[];
     cooldowns: Record<string, Date>;

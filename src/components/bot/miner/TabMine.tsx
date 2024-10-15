@@ -40,6 +40,8 @@ export default function TabMine({
   const [timeLeft, setTimeLeft] = useState(0);
   const [progress, setProgress] = useState(0);
   const [score, setScore] = useState(0);
+  const [permanentSpeed, setPermanentSpeed] = useState(0);
+  const [temporarySpeed, setTemporarySpeed] = useState(0);
 
   const { data, isLoading, isError, refetch } = useQuery<{ user: User }>({
     queryKey: ["user"],
@@ -61,6 +63,27 @@ export default function TabMine({
     if (data?.user) {
       const user = data.user;
       setScore(user.score);
+
+      // Calculate the permanent speed (based on power booster)
+      const baseSpeed = user.miningSpeed;
+      const powerMultiplier = user.boosters.power.multiplier;
+      const permanentSpeedValue = baseSpeed * powerMultiplier;
+      setPermanentSpeed(permanentSpeedValue);
+
+      // Calculate the temporary speed (multipliers from active boosters)
+      let temporarySpeedMultiplier = 1;
+      const now = Date.now();
+      user.boosters.activeBoosters.forEach((booster) => {
+        if (booster.expiresAt && new Date(booster.expiresAt).getTime() > now) {
+          temporarySpeedMultiplier *= booster.multiplier;
+        }
+      });
+
+      const temporarySpeedValue = baseSpeed * (temporarySpeedMultiplier - 1);
+      setTemporarySpeed(temporarySpeedValue);
+
+      const combinedSpeed = permanentSpeedValue + temporarySpeedValue;
+      // Handle the mining session and time left
       if (user.isMining) {
         const interval = setInterval(() => {
           const now = Date.now();
@@ -71,10 +94,9 @@ export default function TabMine({
 
           // Calculate the score incrementally only if we are within 4 hours
           if (elapsed < 4 * 60 * 60 * 1000) {
-            // Calculate the score based on elapsed time
-            const scoreIncrement = (elapsed * user.miningSpeed * 0.001) / 1000;
-            const newScore = user.score + scoreIncrement; // Add the increment to the base score
-            setScore(Number(newScore.toFixed(4))); // Update score to four decimal places
+            const scoreIncrement = (elapsed * combinedSpeed * 0.001) / 1000;
+            const newScore = user.score + scoreIncrement;
+            setScore(Number(newScore.toFixed(4)));
           }
         }, 100);
         return () => clearInterval(interval);
@@ -138,6 +160,7 @@ export default function TabMine({
       </CardHeader>
       <CardContent className='space-y-6'>
         <div className='relative w-48 h-48 mx-auto'>
+          {/* Progress Circle */}
           <svg className='w-full h-full transform -rotate-90'>
             <circle
               className='text-muted-foreground'
@@ -169,13 +192,18 @@ export default function TabMine({
           </div>
         </div>
 
-        <div className='text-center text-lg'>
-          {dictionary["mining-speed"]}:{" "}
-          <span className='font-semibold text-primary'>
-            {user.miningSpeed.toFixed(2)}
-          </span>{" "}
-          {dictionary["speed-boost"]}
+        <div className='grid grid-cols-2 gap-4'>
+          <SpeedCard
+            title={dictionary["permanent-speed"]}
+            speed={permanentSpeed}
+          />
+          <SpeedCard
+            title={dictionary["temporary-speed"]}
+            speed={temporarySpeed}
+          />
         </div>
+
+        {/* Mining Control Button */}
         <Button
           onClick={() => mutation.mutate()}
           disabled={user.isMining || mutation.isPending}
@@ -183,6 +211,7 @@ export default function TabMine({
         >
           {user.isMining ? (
             <svg className='w-6 h-6' viewBox='0 0 50 50'>
+              {/* Custom animation */}
               <circle
                 className='ripple1'
                 cx='25'
@@ -231,6 +260,21 @@ export default function TabMine({
           .
         </p>
       </CardFooter>
+    </Card>
+  );
+}
+
+function SpeedCard({ title, speed }: { title: string; speed: number }) {
+  return (
+    <Card className='overflow-hidden'>
+      <CardHeader className='bg-primary/10 py-2'>
+        <CardTitle className='text-center text-sm font-medium'>
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className='p-4'>
+        <div className='text-center text-2xl font-bold'>{speed.toFixed(2)}</div>
+      </CardContent>
     </Card>
   );
 }

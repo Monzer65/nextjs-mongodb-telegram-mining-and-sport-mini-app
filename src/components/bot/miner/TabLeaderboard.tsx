@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -25,8 +23,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy, Medal, Search, RefreshCw, Loader2 } from "lucide-react";
+import { getDictionary } from "@/get-dictionary";
+import { Locale } from "@/i18n-config";
 
-export default function TabLeaderboard() {
+export default function TabLeaderboard({
+  dictionary,
+  lang,
+}: {
+  dictionary: Awaited<
+    ReturnType<typeof getDictionary>
+  >["miner"]["tabs"]["leaderboard-tab"];
+  lang: Locale;
+}) {
   const initData = useInitData();
   const telegramId = initData?.user?.id || null;
   const { leaderboard, userRank, userScore, isLoading, isError, refetch } =
@@ -62,13 +70,13 @@ export default function TabLeaderboard() {
     return (
       <Card className='w-full max-w-3xl mx-auto'>
         <CardHeader>
-          <CardTitle>Leaderboard</CardTitle>
-          <CardDescription>
-            An error occurred while loading the leaderboard.
-          </CardDescription>
+          <CardTitle>{dictionary.leaderboard}</CardTitle>
+          <CardDescription>{dictionary.error["message"]}</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={() => refetch()}>Try Again</Button>
+          <Button onClick={() => refetch()}>
+            {dictionary.error["try-again-button"]}
+          </Button>
         </CardContent>
       </Card>
     );
@@ -79,8 +87,10 @@ export default function TabLeaderboard() {
       <CardHeader>
         <div className='flex items-center justify-between'>
           <div>
-            <CardTitle className='text-2xl font-bold'>Leaderboard</CardTitle>
-            <CardDescription>Top players by score</CardDescription>
+            {/* <CardTitle className='text-2xl font-bold'>
+              {dictionary.leaderboard}
+            </CardTitle> */}
+            <CardDescription>{dictionary.header_description}</CardDescription>
           </div>
           <Button
             variant='outline'
@@ -89,95 +99,141 @@ export default function TabLeaderboard() {
             disabled={isLoading}
           >
             <RefreshCw className='h-4 w-4' />
+            <span className='sr-only'>refresh leaderboard</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className='mb-4'>
-          <div className='relative'>
-            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
-            <Input
-              placeholder='Search players...'
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className='pl-8'
-            />
-          </div>
-        </div>
         {filteredLeaderboard.length === 0 ? (
-          <p className='text-center py-4'>No players found.</p>
+          <p className='text-center py-4'>{dictionary.No_players_found}</p>
         ) : (
           <ScrollArea className='h-[400px] rounded-md border'>
-            <Table>
+            <Table className={``}>
               <TableHeader>
                 <TableRow>
-                  <TableHead className='w-[100px]'>Rank</TableHead>
-                  <TableHead>Player</TableHead>
-                  <TableHead className='text-right'>Score</TableHead>
+                  <TableHead className='w-[100px]'>{dictionary.rank}</TableHead>
+                  <TableHead>{dictionary.player}</TableHead>
+                  <TableHead className='text-right'>
+                    {dictionary.score}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredLeaderboard.map((player: any, index: number) => (
-                  <TableRow
-                    key={player.telegramId}
-                    className='hover:bg-muted/50'
-                  >
-                    <TableCell>
-                      <div className='flex items-center gap-2'>
-                        {getRankIcon(index + 1)}
-                        <Badge variant={index < 3 ? "default" : "secondary"}>
-                          {index + 1}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className='flex items-center gap-3'>
-                        <Avatar className='w-8 h-8'>
-                          <AvatarImage
-                            src={player.photoUrl || "/placeholder-user.jpg"}
-                            alt={`@${player.username}`}
-                          />
-                          <AvatarFallback>
-                            {player.name?.slice(0, 2)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className='font-medium'>
-                          {player.username || "Unknown Player"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-right font-semibold'>
-                      {player.score !== undefined
-                        ? player.score.toLocaleString()
-                        : "No Score"}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {filteredLeaderboard.map((player: any, index: number) => {
+                  // If the user's rank is greater than 10, add a separator before displaying the user.
+                  if (userRank > 10 && index === 10) {
+                    return (
+                      <React.Fragment key='user-rank-separator'>
+                        <TableRow className='hover:bg-muted/50'>
+                          <TableCell colSpan={3} className='text-center'>
+                            . . .
+                          </TableCell>
+                        </TableRow>
+                        <TableRow
+                          key={player.telegramId}
+                          className={`hover:bg-muted/50 ${
+                            player.telegramId === telegramId
+                              ? "font-bold bg-red-100"
+                              : ""
+                          }`}
+                        >
+                          <TableCell>
+                            <div className='flex items-center gap-2'>
+                              {getRankIcon(userRank)}
+                              <Badge
+                                variant={
+                                  userRank <= 3 ? "default" : "secondary"
+                                }
+                              >
+                                {userRank}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-3'>
+                              <Avatar className='w-8 h-8'>
+                                <AvatarImage
+                                  src={
+                                    player.photoUrl || "/placeholder-user.jpg"
+                                  }
+                                  alt={`@${player.username}`}
+                                />
+                                <AvatarFallback>
+                                  {player.name?.slice(0, 2)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className='font-medium'>
+                                {player.username || "Unknown Player"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className='text-right font-semibold'>
+                            {player.score !== undefined
+                              ? player.score.toLocaleString()
+                              : "No Score"}
+                          </TableCell>
+                        </TableRow>
+                      </React.Fragment>
+                    );
+                  }
+
+                  // Show players directly if their rank is less than or equal to 10.
+                  if (index < 10 || player.telegramId === telegramId) {
+                    return (
+                      <TableRow
+                        key={player.telegramId}
+                        className={`hover:bg-muted/50 ${
+                          player.telegramId === telegramId
+                            ? "font-bold bg-green-100"
+                            : ""
+                        }`}
+                      >
+                        <TableCell>
+                          <div className='flex items-center gap-2'>
+                            {getRankIcon(index + 1)}
+                            <Badge
+                              variant={index < 3 ? "default" : "secondary"}
+                            >
+                              {index + 1}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className='flex items-center gap-3'>
+                            <Avatar className='w-8 h-8'>
+                              <AvatarImage
+                                src={player.photoUrl || "/placeholder-user.jpg"}
+                                alt={`@${player.username}`}
+                              />
+                              <AvatarFallback>
+                                {player.name?.slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className='font-medium'>
+                              {player.username || "Unknown Player"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className='text-right font-semibold'>
+                          {player.score !== undefined
+                            ? player.score.toLocaleString()
+                            : "No Score"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }
+                  return null;
+                })}
               </TableBody>
             </Table>
           </ScrollArea>
         )}
       </CardContent>
       <CardFooter className='bg-muted/50'>
-        {!userRank && !isLoading ? (
+        {!userRank && !isLoading && (
           <p className='text-center w-full text-muted-foreground'>
-            You are not on the leaderboard yet.
+            {dictionary.not_on_leaderboard}
           </p>
-        ) : (
-          <div className='w-full flex justify-between items-center'>
-            <div>
-              <p className='text-sm text-muted-foreground'>Your Rank</p>
-              <p className='text-2xl font-bold'>{userRank}</p>
-            </div>
-            <div>
-              <p className='text-sm text-muted-foreground'>Your Score</p>
-              <p className='text-2xl font-bold'>
-                {userScore !== undefined
-                  ? userScore.toLocaleString()
-                  : "No Score"}
-              </p>
-            </div>
-          </div>
         )}
       </CardFooter>
     </Card>
