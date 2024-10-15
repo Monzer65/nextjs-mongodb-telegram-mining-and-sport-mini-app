@@ -6,53 +6,36 @@ export type User = {
   username: string;
   telegramId: number;
   score: number;
-  lastScoreUpdate?: Timestamp;
+  lastMiningStart: Timestamp;
   referredBy: number | null;
   referrals: string[];
   level: string;
   isMining: boolean;
   miningSpeed: number;
-  effectiveSpeed: number;
-  lastMiningStart: Timestamp | null;
-  timeRemaining: Timestamp;
-  activeBoosts?: ActiveBoosts;
-  boosterCooldowns?: BoosterCooldowns;
+  boosters: {
+    power: {
+      level: number;
+      multiplier: number;
+    };
+    activeBoosters: UserBooster[];
+    cooldowns: Record<string, Date>;
+  };
+  weeklyStreak: number;
+  lastStreakUpdate: Date;
   createdAt: Date;
   updatedAt: Date;
 };
 
 type Timestamp = number;
-
-export type BoostActivationResponse = {
-  success: boolean; // Whether the boost activation was successful
-  boosterId: string; // ID of the activated booster
-  boosterName: string; // Name of the activated booster
-  multiplier: number; // The multiplier applied by the boost
-  expiresAt: number; // When the boost will expire (timestamp)
-  cooldownExpiresAt: number; // When the cooldown will expire (timestamp)
-  error?: string; // Error message in case of failure
-};
-
-export type ActiveBoost = {
-  multiplier: number; // Current multiplier from this boost
-  expiresAt?: number; // Timestamp for when the boost expires
-  level?: number; // Current level for progressive boosters (optional)
-};
-
-export type ActiveBoosts = {
-  [boosterId: string]: ActiveBoost; // Mapping of booster IDs to active boosts
-};
-
-export type BoosterCooldown = {
-  multiplier: number;
-  expiresAt: number;
+export type UserBooster = {
+  id: string;
   level?: number;
+  multiplier: number;
+  expiresAt?: Date;
+  lastUsed: Date;
 };
 
-export type BoosterCooldowns = {
-  [boosterId: string]: BoosterCooldown; // Mapping of booster IDs to cooldowns
-};
-
+// Define the main Booster type
 export type Booster = {
   id: string; // Unique identifier for the booster
   name: string; // Name of the booster

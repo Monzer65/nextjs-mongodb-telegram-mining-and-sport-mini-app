@@ -8,7 +8,13 @@ import { Task } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, ExternalLink } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -146,8 +152,11 @@ export default function TabTasks({
 
   return (
     <Card className='w-full max-w-3xl mx-auto'>
-      <CardHeader>
+      <CardHeader className='border-b'>
+        <CardDescription>{dictionary["header-description"]}</CardDescription>
         {/* <CardTitle className='text-2xl font-bold mb-4'>Tasks</CardTitle> */}
+      </CardHeader>
+      <CardContent className='space-y-6 pt-6'>
         <Select
           value={filter}
           onValueChange={(value: "all" | "completed" | "incomplete") =>
@@ -169,9 +178,7 @@ export default function TabTasks({
             </SelectItem>
           </SelectContent>
         </Select>
-      </CardHeader>
-      <CardContent>
-        <ul className='space-y-4'>
+        <ul className='space-y-4 mt-2'>
           {filteredTasks.map((task) => (
             <li
               key={task.id}

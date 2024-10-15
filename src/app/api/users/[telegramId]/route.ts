@@ -1,6 +1,6 @@
 // app/api/users/[telegramId]/route.ts
 import { connectToDatabase } from "@/lib/mongodb";
-import { ActiveBoosts, BoosterCooldowns, User } from "@/lib/types";
+import { User } from "@/lib/types";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -24,98 +24,35 @@ export async function GET(
     }
 
     const FOUR_HOURS = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
-    const now = Date.now(); // Current timestamp in milliseconds
-    const lastMiningStart = user.lastMiningStart ?? 0; // Fallback to 0 if null
-    const lastScoreUpdate = user.lastScoreUpdate ?? now; // Fallback to current time if null
-
-    // Calculate the time elapsed since mining started (if mining started)
+    const now = Date.now();
+    const lastMiningStart = user.lastMiningStart ?? 0;
     const timeElapsed = lastMiningStart ? now - lastMiningStart : 0;
 
-    // Determine if the user is still mining (mining session hasn't exceeded 4 hours)
-    const isMining = timeElapsed < FOUR_HOURS && user.isMining;
+    // If more than 4 hours have elapsed since the last mining start, finalize the score update
+    if (timeElapsed >= FOUR_HOURS && user.isMining) {
+      const fullSessionScore = (FOUR_HOURS * 0.001 * user.miningSpeed) / 1000;
+      const newScore = user.score + fullSessionScore;
 
-    // Calculate the remaining time in the current mining session
-    const timeRemaining = isMining ? FOUR_HOURS - timeElapsed : 0;
+      const updatedUser = {
+        ...user,
+        score: newScore,
+        isMining: false,
+        lastMiningStart: 0,
+      };
 
-    // Initialize newScore with the user's current score
-    let newScore = user.score;
+      // Update user data in the database
+      await db
+        .collection("telegramUsers")
+        .updateOne({ telegramId }, { $set: updatedUser });
 
-    // Process all active boosts (speed, power, luck, etc.)
-    const activeBoosts = user.activeBoosts || {};
-
-    // Base effective mining speed (without boosts)
-    let effectiveSpeed = user.miningSpeed;
-
-    Object.entries(activeBoosts).forEach(([boostType, boost]) => {
-      if (boost.expiresAt && now < boost.expiresAt) {
-        if (boostType === "speed") {
-          effectiveSpeed *= boost.multiplier;
-        }
-        if (boostType === "fortune") {
-          effectiveSpeed *= boost.multiplier;
-        }
-      }
-      if (boostType === "power") {
-        effectiveSpeed *= boost.multiplier;
-      }
-    });
-
-    // Calculate accumulated score for completed 4-hour sessions
-    const completedSessions = Math.floor((now - lastScoreUpdate) / FOUR_HOURS);
-    if (completedSessions > 0) {
-      const accumulatedScore =
-        completedSessions * FOUR_HOURS * effectiveSpeed * 0.001;
-      newScore += accumulatedScore;
+      return NextResponse.json(
+        { success: true, user: updatedUser },
+        { status: 200 }
+      );
     }
 
-    // Update newScore if the user is still mining in the current session
-    if (isMining) {
-      const currentSessionTime = (now - lastScoreUpdate) % FOUR_HOURS;
-      newScore += (currentSessionTime * effectiveSpeed * 0.001) / 1000; // Convert to seconds
-    }
-
-    // Prepare updated user data
-    const updatedUser = {
-      ...user,
-      score: parseFloat(newScore.toFixed(3)),
-      isMining,
-      effectiveSpeed,
-      timeRemaining,
-      lastScoreUpdate: now,
-    };
-
-    // Remove expired boosts
-    const updatedActiveBoosts: ActiveBoosts = {};
-    Object.entries(activeBoosts).forEach(([boostType, boost]) => {
-      if (
-        boostType === "power" ||
-        (boost && boost.expiresAt && boost.expiresAt > now)
-      ) {
-        updatedActiveBoosts[boostType] = boost;
-      }
-    });
-    updatedUser.activeBoosts = updatedActiveBoosts;
-
-    // Update booster cooldowns
-    const boosterCooldowns = user.boosterCooldowns || {};
-    const updatedBoosterCooldowns: BoosterCooldowns = {};
-    Object.entries(boosterCooldowns).forEach(([boosterId, cooldown]) => {
-      if (cooldown && cooldown.expiresAt > now) {
-        updatedBoosterCooldowns[boosterId] = cooldown;
-      }
-    });
-    updatedUser.boosterCooldowns = updatedBoosterCooldowns;
-
-    // Update user data in the database
-    await db
-      .collection("telegramUsers")
-      .updateOne({ telegramId }, { $set: updatedUser });
-
-    // Return updated user data
-    return NextResponse.json(
-      { success: true, user: updatedUser },
-      { status: 200 }
-    );
+    // If the mining session is still within 4 hours, or no updates are needed:
+    return NextResponse.json({ success: true, user }, { status: 200 });
   } catch (error) {
     console.error("Error fetching user data:", error);
     return NextResponse.json(
@@ -156,15 +93,20 @@ export async function POST(
       referredBy: Number(referralCode) || null, // Default to null if no referral code
       referrals: [], // New users haven't referred anyone yet
       score: 0, // Default score is 0
-      lastScoreUpdate: Date.now(), // Default to current date
       level: "1", // Starting at level 1 as a string (match type)
       isMining: false, // Not mining initially
       miningSpeed: 1, // Default mining speed is 1
-      effectiveSpeed: 1,
-      lastMiningStart: null, // No mining started yet, could also be Date or number if needed
-      timeRemaining: 0, // No time remaining initially (in milliseconds)
-      activeBoosts: {}, // No active boosts initially (optional field, so can be left empty)
-      boosterCooldowns: {}, // No booster cooldowns initially (optional field)
+      lastMiningStart: 0, // No mining started yet, could also be Date or number if needed
+      boosters: {
+        power: {
+          level: 0,
+          multiplier: 1,
+        },
+        activeBoosters: [],
+        cooldowns: {},
+      },
+      weeklyStreak: 0,
+      lastStreakUpdate: new Date(),
       createdAt: new Date(), // Default to current date
       updatedAt: new Date(), // Default to current date
     };
@@ -220,7 +162,9 @@ export async function PATCH(
     const { db } = await connectToDatabase();
 
     // Fetch user
-    const user = await db.collection("telegramUsers").findOne({ telegramId });
+    const user = (await db
+      .collection("telegramUsers")
+      .findOne({ telegramId })) as User;
 
     if (!user) {
       return NextResponse.json(
@@ -229,34 +173,40 @@ export async function PATCH(
       );
     }
 
-    if (user.isMining == true) {
-      return NextResponse.json(
-        { success: false, error: "User is already mining" },
-        { status: 404 }
-      );
+    const now = Date.now();
+    const FOUR_HOURS = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
+
+    // Check if the user is already mining
+    if (user.isMining && user.lastMiningStart) {
+      const timeElapsed = now - user.lastMiningStart;
+      if (timeElapsed < FOUR_HOURS) {
+        return NextResponse.json(
+          { success: false, error: "User is already mining" },
+          { status: 400 }
+        );
+      }
     }
 
-    const now = Date.now();
-    const FOUR_HOURS = 4 * 60 * 60 * 1000;
-    const isMining = true;
-    const lastMiningStart = now;
-    const lastScoreUpdate = now;
-    const timeRemaining = FOUR_HOURS - lastMiningStart;
-
+    // If the user wasn't mining or the previous session is complete, start a new mining session
     const updatedUser = {
       ...user,
-      lastMiningStart,
-      lastScoreUpdate,
-      isMining,
-      timeRemaining,
+      isMining: true,
+      lastMiningStart: now,
+      lastSessionCompleted: false,
     };
 
+    // Update user data in the database
     await db
       .collection("telegramUsers")
       .updateOne({ telegramId }, { $set: updatedUser });
 
+    // Return updated user data
     return NextResponse.json(
-      { success: true, user: updatedUser },
+      {
+        success: true,
+        message: "Mining started successfully",
+        user: updatedUser,
+      },
       { status: 200 }
     );
   } catch (error) {

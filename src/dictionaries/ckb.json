@@ -43,7 +43,7 @@
       "earn-tab": {
         "titles": {
           "tasks": "ئەرکەکان",
-          "boost": "بەهێزکردن",
+          "boost": "بەهێزکەرەکان",
           "referrals": "ئاماژە پێکراوەکان",
           "mini-games": "یاریە بچووکەکان"
         },
@@ -67,6 +67,7 @@
             "completed-tasks": "ئەرکە تەواوبووەکان",
             "incomplete-tasks": "ئەرکە ناتەواوەکان"
           },
+          "header-description": "لە کەناڵەکانی تەلگرام بەشداری بکە یان تەماشای ویدیوکان بکە و خەڵاتی زۆرتر وەر بگرە",
           "task-1-title": "بەشداربە لە کەناڵی تیلیگراممان",
           "task-2-title": "بەشداربە لە وت‌ووێژی تیلیگراممان",
           "points": "خاڵ",
@@ -107,25 +108,38 @@
           },
           "toast-failed-active": {
             "title": "هەڵە ڕویدا",
-            "description": "چالاککردن شکستی هێنا. دواتر هەوڵبدەرەوە"
+            "description": "چالاک کردن شکستی هێنا. دواتر هەوڵبدەرەوە"
           },
           "error": {
             "message": "هەڵەیەک ڕوویداوە لەکاتی بارکردنی بەهێزکەرەوەکان",
             "try-again-button": "دووبارە هەوڵ بدە"
           },
-          "badge-active": "چالاک",
-          "badge-cooldown": "پشوودان",
+          "booster_activated": "بوستەر چالاک کرا",
+          "booster_activated_description": "بوستەری تۆ بەسەرکەوتوویی چالاک کرا.",
+          "booster_activation_failed": "چالاک کردنی بوستەر سەرکەوتوو نەبوو",
+          "error_loading_boosters": "هەڵە لە بارکردنی بوستەرەکان. تکایە دوبارە هەوڵ بدە.",
+          "cost": "نرخ",
+          "free": "بەخۆڕایی",
+          "multiplier": "هێز",
+          "random": "بەختەکی",
+          "active_duration": "ماوەی چالاک بوون",
+          "on_cooldown": "لە ماوەی پشودانە",
+          "header-description": "بە چالاک کردنەوەی بەهێزکەرەوەکان خێرایی هەڵکۆڵینەکەت زۆرتر بکە",
+          "badge-active": "چالاکە",
+          "badge-cooldown": "لە کاتی پشوودانە",
           "level": "قۆناغ",
           "points": "خاڵ",
           "duration": "ماوە",
-          "upgrade": "بەرزکردنەوە",
-          "activate": "چالاک کردن",
-          "active": "چالاک",
-          "cooldown": "پشوودان",
-          "disable-already-active": "بەهێزکەرەوەکە جارێ چالاکە",
+          "upgrade": "بەرزی کەرەوە",
+          "activate": "چالاکی بکە",
+          "active": "چالاکە",
+          "activating": "لە حاڵی چالاک کردنە",
+          "cooldown": "لە کاتی پشوودانە",
+          "disable-already-active": "بەهێزکەرەوەکە چالاکە",
           "disable-on-cooldown": "بەهێزکەرەوەکە لە کاتی پشوودانە",
           "disable-not-enough-points": "خاڵەکانت بەس نیە",
           "disable-start-mining-first": "ئەبێ لە پێشا دەس بە هەڵکۆڵین بکەیت",
+          "disable-pending": "لە حاڵی چالاک کردنەوەیە",
           "speed": "بەهێزکەرەوەی ڕۆژانە",
           "power": "بەهێزکەرەوەی جێگیر",
           "fortune": "چەرخی بەختەوەری"

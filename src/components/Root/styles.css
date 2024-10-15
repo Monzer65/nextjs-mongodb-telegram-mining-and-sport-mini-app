@@ -10,3 +10,37 @@
   background-image: url("../../app/_assets/net.jpg");
   background-size: cover;
 }
+
+.ripple1,
+.ripple2,
+.ripple3 {
+  animation: ripple 1.5s infinite ease-in-out;
+  opacity: 0;
+}
+
+.ripple1 {
+  animation-delay: 0s;
+}
+
+.ripple2 {
+  animation-delay: 0.3s;
+}
+
+.ripple3 {
+  animation-delay: 0.6s;
+}
+
+@keyframes ripple {
+  0% {
+    r: 0;
+    opacity: 0.8;
+  }
+  50% {
+    r: 10;
+    opacity: 0.4;
+  }
+  100% {
+    r: 20;
+    opacity: 0;
+  }
+}

@@ -1,22 +1,7 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { boosters } from "@/lib/static-data";
 import { NextResponse } from "next/server";
-import { ActiveBoosts, BoosterCooldowns, User } from "@/lib/types";
-
-// Helper function to calculate the upgrade cost for progressive boosters
-const calculateUpgradeCost = (currentLevel: number): number => {
-  return Math.floor(2 * Math.pow(1.5, currentLevel));
-};
-
-// Helper function to calculate the new multiplier for the progressive booster
-const calculateMultiplier = (level: number): number => {
-  return 1 + 0.05 * level;
-};
-
-// Helper function to generate a random multiplier for the "fortune" booster
-const getRandomMultiplier = (): number => {
-  return Math.random() * (3 - 1) + 1; // Random multiplier between 1x and 3x
-};
+import { User } from "@/lib/types";
 
 export async function POST(
   request: Request,
@@ -38,139 +23,142 @@ export async function POST(
       );
     }
 
-    if (!user.isMining && boosterId !== "power") {
-      return NextResponse.json(
-        { success: false, error: "Mining not started yet" },
-        { status: 400 }
-      );
-    }
-
-    const now = Date.now();
     const booster = boosters.find((b) => b.id === boosterId);
-
     if (!booster) {
       return NextResponse.json(
-        { success: false, error: "Invalid booster" },
+        { success: false, error: "Booster not found" },
+        { status: 404 }
+      );
+    }
+
+    // Initialize boosters field if it doesn't exist
+    if (!user.boosters) {
+      user.boosters = {
+        power: { level: 0, multiplier: 1 },
+        activeBoosters: [],
+        cooldowns: {},
+      };
+    }
+
+    // Check cooldown
+    const lastUsed = user.boosters.cooldowns[boosterId];
+    if (
+      lastUsed &&
+      Date.now() - new Date(lastUsed).getTime() <
+        (booster.cooldownDuration || 0)
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Booster is on cooldown" },
         { status: 400 }
       );
     }
 
-    let newScore = user.score;
-    let updatedActiveBoosts: ActiveBoosts = { ...user.activeBoosts };
-    let updatedBoosterCooldowns: BoosterCooldowns = {
-      ...user.boosterCooldowns,
-    };
-    let cooldownExpiresAt = now;
+    // Check if user has enough score to activate the booster
+    if (user.score < booster.cost) {
+      return NextResponse.json(
+        { success: false, error: "Insufficient score to activate booster" },
+        { status: 400 }
+      );
+    }
 
-    // Handle "Upgrade mining speed" (progressive) booster
-    if (boosterId === "power") {
-      const userBoosterLevel = user.activeBoosts?.power?.level || 0;
-      const upgradeCost = calculateUpgradeCost(userBoosterLevel);
+    // Apply booster effects and reduce score accordingly
+    switch (booster.id) {
+      case "power":
+        const nextLevel = user.boosters.power.level + 1;
+        if (nextLevel <= (booster.maxLevel || Infinity)) {
+          user.boosters.power.level = nextLevel;
+          user.boosters.power.multiplier =
+            1 + booster.speedIncrement! * nextLevel;
+          user.score -= booster.cost; // Deduct score after confirming upgrade
+        } else {
+          return NextResponse.json(
+            { success: false, error: "Power booster already at max level" },
+            { status: 400 }
+          );
+        }
+        break;
 
-      if (user.score < upgradeCost) {
+      case "fortune":
+        const fortuneMultiplier =
+          typeof booster.multiplier === "function"
+            ? booster.multiplier()
+            : booster.multiplier;
+        user.boosters.activeBoosters.push({
+          id: booster.id,
+          multiplier: fortuneMultiplier,
+          expiresAt: new Date(Date.now() + (booster.activeDuration || 0)),
+          lastUsed: new Date(),
+        });
+        user.score -= booster.cost; // Deduct score for fortune booster
+        break;
+
+      case "speed":
+        // Update weekly streak
+        const now = new Date();
+        const daysSinceLastStreak =
+          (now.getTime() - new Date(user.lastStreakUpdate).getTime()) /
+          (1000 * 60 * 60 * 24);
+        user.weeklyStreak =
+          daysSinceLastStreak > 7
+            ? 1
+            : daysSinceLastStreak > 1 && daysSinceLastStreak <= 2
+            ? user.weeklyStreak + 1
+            : 1;
+        user.lastStreakUpdate = now;
+
+        const speedMultiplier = Math.min(8, 1 + user.weeklyStreak * 0.5); // Max 8x multiplier
+        user.boosters.activeBoosters.push({
+          id: booster.id,
+          multiplier: speedMultiplier,
+          expiresAt: new Date(Date.now() + (booster.activeDuration || 0)),
+          lastUsed: now,
+        });
+        user.score -= booster.cost; // Deduct score for speed booster
+        break;
+
+      default:
         return NextResponse.json(
-          { success: false, error: "Insufficient score for upgrade" },
+          { success: false, error: "Unsupported booster type" },
           { status: 400 }
         );
-      }
-
-      const newMultiplier = calculateMultiplier(userBoosterLevel + 1);
-      updatedActiveBoosts = {
-        ...updatedActiveBoosts,
-        power: {
-          level: userBoosterLevel + 1,
-          multiplier: newMultiplier,
-        },
-      };
-
-      newScore -= upgradeCost;
     }
-    // Handle "Wheel of Fortune" booster
-    else if (boosterId === "fortune") {
-      const randomMultiplier = getRandomMultiplier();
-      updatedActiveBoosts = {
-        ...updatedActiveBoosts,
-        fortune: {
-          multiplier: randomMultiplier,
-          expiresAt: now + (booster.activeDuration ?? 0), // Active for set duration
-        },
-      };
-    }
-    // Handle standard boosters with cooldown and active time
-    else {
-      // Check if booster is on cooldown
-      if (
-        user.boosterCooldowns?.[boosterId]?.expiresAt &&
-        user.boosterCooldowns?.[boosterId]?.expiresAt > now
-      ) {
-        return NextResponse.json(
-          { success: false, error: "Booster is on cooldown" },
-          { status: 400 }
-        );
-      }
 
-      // Deduct cost from score
-      newScore -= booster.cost;
-      if (newScore < 0) {
-        return NextResponse.json(
-          { success: false, error: "Insufficient score" },
-          { status: 400 }
-        );
-      }
+    // Update cooldown
+    user.boosters.cooldowns[boosterId] = new Date();
 
-      // Add active boost
-      updatedActiveBoosts = {
-        ...updatedActiveBoosts,
-        [boosterId]: {
-          multiplier: booster.multiplier,
-          expiresAt: now + (booster.activeDuration ?? 0),
-        },
-      };
-
-      // Add/update cooldown
-      cooldownExpiresAt =
-        now + (booster.activeDuration ?? 0) + (booster.cooldownDuration ?? 0);
-      updatedBoosterCooldowns = {
-        ...updatedBoosterCooldowns,
-        [boosterId]: {
-          expiresAt: cooldownExpiresAt,
-        },
-      };
-    }
+    // Remove expired boosters
+    user.boosters.activeBoosters = user.boosters.activeBoosters.filter(
+      (b) => new Date(b.expiresAt!) > new Date()
+    );
 
     // Update user in the database
-    const result = await db.collection("telegramUsers").updateOne(
+    await db.collection<User>("telegramUsers").updateOne(
       { telegramId },
       {
         $set: {
-          score: newScore,
-          activeBoosts: updatedActiveBoosts,
-          boosterCooldowns: updatedBoosterCooldowns,
+          score: user.score,
+          boosters: user.boosters,
+          weeklyStreak: user.weeklyStreak,
+          lastStreakUpdate: user.lastStreakUpdate,
         },
       }
     );
 
-    if (result.modifiedCount === 0) {
-      throw new Error("Failed to update user data");
-    }
-
+    // Return updated user data
     return NextResponse.json({
       success: true,
-      boosterId,
-      boosterName: booster.name,
-      multiplier:
-        boosterId === "power"
-          ? updatedActiveBoosts.power.multiplier
-          : booster.multiplier,
-      expiresAt:
-        boosterId === "power" ? null : now + (booster.activeDuration ?? 0),
-      cooldownExpiresAt: boosterId === "power" ? null : cooldownExpiresAt,
-      level: boosterId === "power" ? updatedActiveBoosts.power.level : null,
+      message: "Booster activated successfully",
+      user: {
+        score: user.score,
+        boosters: user.boosters,
+        weeklyStreak: user.weeklyStreak,
+        lastStreakUpdate: user.lastStreakUpdate,
+      },
     });
   } catch (error) {
-    console.error("Error in boost API:", error);
+    console.error("Error activating booster:", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
+      { success: false, error: "Internal Server Error" },
       { status: 500 }
     );
   }
