@@ -143,8 +143,8 @@
           "disable-not-enough-points": "Not enough points",
           "disable-start-mining-first": "Start mining to activate boosters",
           "disable-pending": "Activating your booster",
-          "speed": "Daily Turbo Boost",
-          "power": "Mining Efficiency Upgrade",
+          "speed": "Daily Turbo",
+          "power": "Fixed Power",
           "fortune": "Fortune Spin"
         },
         "mini-games-tab": {

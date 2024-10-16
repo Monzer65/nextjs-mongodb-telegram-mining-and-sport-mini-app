@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect, useRef } from "react";
-import { Loader2, Play, Pause, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loader2, Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +12,9 @@ import {
 import { useInitData } from "@telegram-apps/sdk-react";
 import { getDictionary } from "@/get-dictionary";
 import { User } from "@/lib/types";
-import { fetchUserData } from "@/lib/utils";
+import { fetchUserData, formatTime } from "@/lib/utils";
+import ProgressCircle from "./ProgressCircle";
+import AnimatedRipple from "./Ripple";
 
 const startMining = async (
   telegramId: number | undefined
@@ -135,23 +137,12 @@ export default function TabMine({
 
   const { user } = data;
 
-  const formatTime = (ms: number) => {
-    const hours = Math.floor(ms / 3600000);
-    const minutes = Math.floor((ms % 3600000) / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  };
-
-  const scoreString = score.toFixed(4).toString();
-
   return (
     <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader>
         <CardTitle className='text-center'>
           <div className='flex justify-center mt-2 w-full text-3xl font-bold'>
-            {scoreString}
+            {score.toFixed(4)}
           </div>
           <span className='text-muted-foreground text-sm'>
             {dictionary["total-score"]}
@@ -161,29 +152,7 @@ export default function TabMine({
       <CardContent className='space-y-6'>
         <div className='relative w-48 h-48 mx-auto'>
           {/* Progress Circle */}
-          <svg className='w-full h-full transform -rotate-90'>
-            <circle
-              className='text-muted-foreground'
-              strokeWidth='8'
-              stroke='currentColor'
-              fill='transparent'
-              r='88'
-              cx='96'
-              cy='96'
-            />
-            <circle
-              className='text-primary'
-              strokeWidth='8'
-              strokeDasharray={2 * Math.PI * 88}
-              strokeDashoffset={2 * Math.PI * 88 * ((100 - progress) / 100)}
-              strokeLinecap='round'
-              stroke='currentColor'
-              fill='transparent'
-              r='88'
-              cx='96'
-              cy='96'
-            />
-          </svg>
+          <ProgressCircle progress={progress} />
           <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center'>
             <div className='text-2xl font-bold'>{formatTime(timeLeft)}</div>
             <span className='text-muted-foreground text-xs'>
@@ -210,36 +179,7 @@ export default function TabMine({
           className='w-full'
         >
           {user.isMining ? (
-            <svg className='w-6 h-6' viewBox='0 0 50 50'>
-              {/* Custom animation */}
-              <circle
-                className='ripple1'
-                cx='25'
-                cy='25'
-                r='0'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-              />
-              <circle
-                className='ripple2'
-                cx='25'
-                cy='25'
-                r='0'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-              />
-              <circle
-                className='ripple3'
-                cx='25'
-                cy='25'
-                r='0'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-              />
-            </svg>
+            <AnimatedRipple />
           ) : mutation.isPending ? (
             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
           ) : (

@@ -23,7 +23,7 @@ export const boosters: Booster[] = [
     id: "fortune",
     name: "Wheel of Fortune",
     cost: 0, // Free to spin
-    multiplier: () => Math.random() * (3 - 1) + 1, // Random multiplier between 1x and 3x
+    multiplier: () => Math.random() * (10 - 1) + 1, // Random multiplier between 1x and 3x
     activeDuration: 600000, // Lasts for 10 minutes (in milliseconds)
     cooldownDuration: 14400000, // 4 hours
   },

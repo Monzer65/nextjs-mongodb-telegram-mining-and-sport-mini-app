@@ -143,8 +143,8 @@
           "disable-not-enough-points": "امتیاز کافی نیست",
           "disable-start-mining-first": "اول باید استخراج را شروع کنی",
           "disable-pending": "درحال فعالسازی بوستر",
-          "speed": "ارتقاء توربوی روزانه",
-          "power": "ارتقاء سرعت ثابت",
+          "speed": "توربوی روزانه",
+          "power": "سرعت ثابت",
           "fortune": "گردونه بخت"
         },
         "mini-games-tab": {

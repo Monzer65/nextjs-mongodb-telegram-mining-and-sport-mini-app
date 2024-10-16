@@ -8,7 +8,20 @@ export async function POST(
   { params }: { params: { telegramId: string } }
 ) {
   try {
-    const { boosterId } = await request.json();
+    const { boosterId, randomMultiplier } = await request.json();
+
+    if (
+      boosterId == "fortune" &&
+      !randomMultiplier &&
+      randomMultiplier > 10 &&
+      randomMultiplier <= 0
+    ) {
+      return NextResponse.json(
+        { success: false, error: "Random multiplier must be provided" },
+        { status: 404 }
+      );
+    }
+
     const telegramId = Number(params.telegramId);
 
     const { db } = await connectToDatabase();
@@ -93,13 +106,9 @@ export async function POST(
         break;
 
       case "fortune":
-        const fortuneMultiplier =
-          typeof booster.multiplier === "function"
-            ? booster.multiplier()
-            : booster.multiplier;
         user.boosters.activeBoosters.push({
           id: booster.id,
-          multiplier: fortuneMultiplier,
+          multiplier: randomMultiplier,
           expiresAt: new Date(Date.now() + (booster.activeDuration || 0)),
           lastUsed: new Date(),
         });
