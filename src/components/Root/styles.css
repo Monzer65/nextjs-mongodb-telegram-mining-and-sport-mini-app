@@ -44,16 +44,3 @@
     opacity: 0;
   }
 }
-
-.wedge {
-  width: 50%; /* Adjust as needed for wedge width */
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  /* Border properties to create the wedge shape */
-  border-right: 2px solid #fff;
-  border-bottom: 2px solid #fff;
-  /* Transition for smooth animation */
-  transition: transform 1s ease-in-out;
-}

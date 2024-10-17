@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, RefreshCcw } from "lucide-react";
 import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
-import FortuneSpinner from "./FortuneSpinner";
 
 type Timestamp = number;
 type BoosterId = "speed" | "power" | "fortune";
@@ -43,8 +42,6 @@ const activateBooster = async (
   return response.json();
 };
 
-// Memoize these functions to prevent unnecessary recalculations
-
 export default function TabBoosts({
   dictionary,
   lang,
@@ -62,21 +59,22 @@ export default function TabBoosts({
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<number | null>(null);
   const [rotation, setRotation] = useState(0);
-  const spinnerRef = useRef<HTMLDivElement>(null);
 
   const segments = [
-    { label: "0", color: "#e57373", angle: "0" },
-    { label: "1", color: "#f06292", angle: "36" },
-    { label: "2", color: "#ba68c8", angle: "72" },
-    { label: "3", color: "#9575cd", angle: "108" },
-    { label: "4", color: "#7986cb", angle: "144" },
-    { label: "5", color: "#64b5f6", angle: "180" },
-    { label: "6", color: "#4db6ac", angle: "216" },
-    { label: "7", color: "#81c784", angle: "252" },
-    { label: "8", color: "#ffb74d", angle: "288" },
-    { label: "9", color: "#ff8a65", angle: "324" },
-    { label: "10", color: "#ff0000", angle: "360" },
+    { label: "0", multiplier: 0 },
+    { label: "1", multiplier: 1 },
+    { label: "2", multiplier: 2 },
+    { label: "3", multiplier: 3 },
+    { label: "4", multiplier: 4 },
+    { label: "5", multiplier: 5 },
+    { label: "6", multiplier: 6 },
+    { label: "7", multiplier: 7 },
+    { label: "8", multiplier: 8 },
+    { label: "9", multiplier: 9 },
+    { label: "10", multiplier: 10 },
   ];
+
+  const segmentAngle = 360 / segments.length;
 
   const { data, isLoading, isError, refetch } = useQuery<{ user: User }>({
     queryKey: ["user"],
@@ -145,11 +143,32 @@ export default function TabBoosts({
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (spinnerRef.current) {
-      spinnerRef.current.style.transform = `rotate(${rotation}deg)`;
-    }
-  }, [rotation]);
+  const spinWheel = () => {
+    setSpinning(true);
+    setRotation(0);
+    setResult(null);
+
+    setTimeout(() => {
+      const randomRotation = Math.floor(Math.random() * 360) + 1080; // Spin at least 3 full rotations
+      setRotation(randomRotation);
+
+      setTimeout(() => {
+        const finalRotation = randomRotation % 360;
+        const exactSegmentIndex = (360 - finalRotation) / segmentAngle; // Calculate the exact segment index with decimal
+        const selectedSegmentIndex = Math.floor(exactSegmentIndex);
+        const selectedMultiplier = segments[selectedSegmentIndex].multiplier;
+        const decimalPart = exactSegmentIndex - selectedSegmentIndex; // Extract decimal part
+        const preciseResult = selectedMultiplier + decimalPart;
+        setResult(preciseResult);
+        setSpinning(false);
+
+        mutation.mutate({
+          boosterId: "fortune",
+          randomMultiplier: preciseResult,
+        });
+      }, 3000); // Simulate a 3 second spin
+    }, 0);
+  };
 
   if (isLoading) {
     return (
@@ -177,45 +196,6 @@ export default function TabBoosts({
 
   const { user } = data;
 
-  const handleSpin = () => {
-    if (spinning) return;
-
-    setSpinning(true);
-    setResult(null);
-
-    const spinDuration = 5000; // 5 seconds
-    const finalResult = Math.floor(Math.random() * 10) + 1; // Random number between 1 and 10
-    const finalRotation = 1800 + (finalResult - 1) * (360 / segments.length);
-
-    // Smooth acceleration and deceleration
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-
-    let start: number | null = null;
-    const animate = (time: number) => {
-      if (start === null) start = time;
-      const elapsed = time - start;
-      const progress = Math.min(elapsed / spinDuration, 1);
-      const easedProgress = easeInOutCubic(progress);
-
-      setRotation(easedProgress * finalRotation);
-      // const spin = Math.floor(3600 + Math.random() * 360);
-      // setRotation(rotation + spin);
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setResult(finalResult);
-        setSpinning(false);
-        // Trigger mutation with the correct randomMultiplier
-        mutation.mutate({
-          boosterId: "fortune",
-          randomMultiplier: finalResult,
-        });
-      }
-    };
-
-    requestAnimationFrame(animate);
-  };
   return (
     <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader className='border-b mb-4'>
@@ -242,48 +222,80 @@ export default function TabBoosts({
           const level = userBooster?.level || 0;
           const maxLevel = booster.maxLevel || Infinity;
           const boosterCost = calculateBoosterCost(booster, userBooster);
-          const segmentAngle = 360 / segments.length;
 
           if (booster.id === "fortune") {
             return (
-              <Card key={booster.id} className='w-full max-w-sm mx-auto'>
+              <Card className='w-full max-w-sm mx-auto'>
                 <CardHeader>
                   <CardTitle>{dictionary["fortune"]}</CardTitle>
                   <CardDescription>{dictionary.free}</CardDescription>
                 </CardHeader>
                 <CardContent className='flex flex-col flex-grow'>
-                  <div className='relative w-48 h-48 mb-4'>
-                    {/* Spinner container */}
-                    <div
-                      className='absolute w-full h-full rounded-full border-4 border-primary transition-transform duration-[5000ms] ease-in-out'
-                      style={{ transform: `rotate(${rotation}deg)` }}
+                  <div className='space-y-2 mb-4'>
+                    <p>
+                      {dictionary.multiplier}: {dictionary.random}
+                    </p>
+                  </div>
+                  <div className='relative m-auto mb-2'>
+                    <svg
+                      width='200'
+                      height='200'
+                      viewBox='0 0 200 200'
+                      style={{
+                        transition: spinning ? "transform 3s ease-out" : "none",
+                        transform: `rotate(${rotation}deg)`,
+                      }}
                     >
-                      {/* Segments */}
-                      {segments.map((segment, index) => (
-                        <div
-                          key={index}
-                          className='absolute w-full h-full overflow-auto border-t border-t-white'
-                          style={{
-                            transform: `rotate(${index * segmentAngle}deg)`,
-                            clipPath: "polygon(36% 0, 50% 50%, 64% 0)",
-                            backgroundColor: segment.color,
-                          }}
-                        >
-                          <div className='absolute top-2 left-1/2 -translate-x-1/2 text-2xl z-50 text-black'>
-                            <span className='font-bold'>{segment.label}</span>
-                          </div>
-                        </div>
-                      ))}
+                      {segments.map((segment, index) => {
+                        const startAngle = index * segmentAngle;
+                        const endAngle = startAngle + segmentAngle;
+                        const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+                        const startX =
+                          100 +
+                          100 * Math.cos((startAngle - 90) * (Math.PI / 180));
+                        const startY =
+                          100 +
+                          100 * Math.sin((startAngle - 90) * (Math.PI / 180));
+                        const endX =
+                          100 +
+                          100 * Math.cos((endAngle - 90) * (Math.PI / 180));
+                        const endY =
+                          100 +
+                          100 * Math.sin((endAngle - 90) * (Math.PI / 180));
+
+                        return (
+                          <g key={index}>
+                            <path
+                              d={`M100,100 L${startX},${startY} A100,100 0 ${largeArcFlag},1 ${endX},${endY} Z`}
+                              fill={`hsl(${index * 30}, 100%, 70%)`}
+                              stroke='#000'
+                            />
+                            <text
+                              x='100'
+                              y='100'
+                              fill='#000'
+                              fontWeight='bold'
+                              fontSize='14'
+                              textAnchor='middle'
+                              alignmentBaseline='middle'
+                              transform={`rotate(${
+                                startAngle + segmentAngle / 2
+                              }, 100, 100) translate(0, -80)`}
+                            >
+                              {segment.label}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                    {/* pointer */}
+                    <div className='absolute top-[-10px] left-1/2 translate-x-[-50%] border-l-[10px] border-r-[10px] border-l-transparent border-r-transparent border-t-[20px] border-t-red-500' />
+                    {/* middle circle */}
+                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white z-10 w-10 h-10 rounded-full flex items-center justify-center'>
+                      {result !== null && (
+                        <p className='font-bold'>{result.toFixed(2)}</p>
+                      )}
                     </div>
-
-                    {/* Small circle in the middle */}
-                    <div className='absolute w-12 h-12 rounded-full bg-white top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10' />
-
-                    {result !== null && (
-                      <p className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold z-50'>
-                        {result}
-                      </p>
-                    )}
                   </div>
 
                   <div className='space-y-4 mt-auto'>
@@ -298,13 +310,14 @@ export default function TabBoosts({
                         dictionary
                       )}
                     </div>
+
                     <Button
-                      onClick={handleSpin}
+                      onClick={spinWheel}
                       disabled={
                         spinning ||
-                        mutation.isPending ||
                         isActive ||
-                        isOnCooldown
+                        isOnCooldown ||
+                        mutation.isPending
                       }
                       className='w-full'
                     >
@@ -343,7 +356,7 @@ export default function TabBoosts({
                       </p>
                     )}
                   </div>
-                  <div className='space-y-4 mt-auto'>
+                  <div className='space-y-4 mt-auto '>
                     <div className='h-8'>
                       {renderProgressBar(
                         !!isActive,
@@ -410,8 +423,11 @@ export function renderProgressBar(
     return (
       <div className='mb-2'>
         <p className='flex justify-between'>
-          <span>{dictionary.active_duration}</span>
-          <span> {formatTimeInMinutes(timeRemaining)}</span>
+          <span className='truncate'>{dictionary.active_duration}</span>
+          <span className='truncate'>
+            {" "}
+            {formatTimeInMinutes(timeRemaining)}
+          </span>
         </p>
         <Progress value={progress} className='mt-2' />
       </div>
@@ -427,8 +443,11 @@ export function renderProgressBar(
     return (
       <div className='mb-2'>
         <p className='flex justify-between'>
-          <span>{dictionary.cooldown}</span>
-          <span> {formatTimeInMinutes(timeRemaining)}</span>
+          <span className='truncate'>{dictionary.cooldown}</span>
+          <span className='truncate'>
+            {" "}
+            {formatTimeInMinutes(timeRemaining)}
+          </span>
         </p>
         <Progress value={progress} className='mt-2' />
       </div>
