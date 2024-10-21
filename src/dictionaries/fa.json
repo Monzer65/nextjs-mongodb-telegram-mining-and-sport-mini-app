@@ -154,7 +154,29 @@
           "play": "الان بازی کن",
           "sudoku": {
             "name": "سودوکو",
-            "description": ""
+            "description": "",
+            "toast-success": {
+              "title": "امتیاز شما با موفقیت ثبت شد",
+              "description": "امتیاز شما ثبت شد"
+            },
+            "toast-failed": {
+              "title": "خطا در ثبت امتیاز",
+              "description": "خطایی در ثبت امتیاز شما رخ داده. دوباره تلاش کنید."
+            },
+            "select_ifficulty": "انتخاب درجه سختی",
+            "easy": "آسان",
+            "medium": "متوسط",
+            "hard": "سخت",
+            "time": "زمان",
+            "mistakes": "اشتباهات",
+            "game_completed": "بازی تمام شد",
+            "your_score": "امتیاز شما",
+            "save_score": "ذخیره و ثبت امتیاز",
+            "dialog_title": "تبرییییییک",
+            "dialog_description": "شما پازل سودوکو را حل کردید",
+            "seconds": "ثانیه",
+            "button_saving": "درحال ذخیره سازی",
+            "button_save": "دریافت امتیازات"
           },
           "chess": {
             "name": "شطرنج",
@@ -186,6 +208,15 @@
         "chain": "زنجیره",
         "public_key": "کلید عمومی"
       }
+    },
+    "setting": {
+      "settings": "تنظیمات",
+      "language": "زبان",
+      "terms": "شرایط و سیاست حفظ حریم خصوصی",
+      "help": "راهنما و پشتیبانی",
+      "about": "درباره",
+      "language_setting": "تنظیمات زبان",
+      "language_description": "زبان مورد نظر خود را انتخاب کنید"
     },
     "navbar": {
       "home": "خانه",

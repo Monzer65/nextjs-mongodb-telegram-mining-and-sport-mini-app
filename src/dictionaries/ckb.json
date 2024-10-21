@@ -154,7 +154,29 @@
           "play": "کایە بکە",
           "sudoku": {
             "name": "سودۆکو",
-            "description": "یاری سودۆکو"
+            "description": "یاری سودۆکو",
+            "toast-success": {
+              "title": "نمرەکان بە سەرکەوتوویی پاشەکەوت کرا",
+              "description": "نمرەکەت سەیڤ کراوە"
+            },
+            "toast-failed": {
+              "title": "هەڵە لە پاشەکەفت کردنی نمرە",
+              "description": "کێشەیەک هەبوو لە پاشەکەوتکردنی نمرەکەت. تکایە دووبارە هەوڵبدەرەوە."
+            },
+            "select_ifficulty": "سەختی هەڵبژێرە",
+            "easy": "ئاسان",
+            "medium": "ناوەند",
+            "hard": "سەخت",
+            "time": "کات",
+            "mistakes": "هەڵەکان",
+            "game_completed": "یاری تەواو بوو",
+            "your_score": "نمرەکەت",
+            "save_score": "پاشەکەوت کردنی نمرەکان",
+            "dialog_title": "پیرۆزە",
+            "dialog_description": "تۆ مەتەڵەکەی سودۆکوت تەواو کردووە",
+            "seconds": "چرکە",
+            "button_saving": "پاشەکەوتکردن",
+            "button_save": "پاداشەکەت وەرگرە"
           },
           "chess": {
             "name": "شەترەنج",
@@ -186,6 +208,15 @@
         "chain": "زنجیرە",
         "public_key": "کلیلی گشتی"
       }
+    },
+    "setting": {
+      "settings": "ڕێکخستنەکان",
+      "language": "زمان",
+      "terms": "مەرجەکان و سیاسەتی پاراستنی نهێنی",
+      "help": "یارمەتی و پشتگیری",
+      "about": "دەربارە",
+      "language_setting": "ڕێکخستنەکانی زمان",
+      "language_description": "زمانی دڵخوازی خۆت هەڵبژێرە"
     },
     "navbar": {
       "home": "ماڵەوە",

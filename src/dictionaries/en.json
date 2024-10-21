@@ -154,7 +154,29 @@
           "play": "Play Now",
           "sudoku": {
             "name": "Sudoku",
-            "description": ""
+            "description": "",
+            "toast-success": {
+              "title": "Score saved successfully!",
+              "description": "Your score has been saved"
+            },
+            "toast-failed": {
+              "title": "Error saving score",
+              "description": "There was a problem saving your score. Please try again."
+            },
+            "select_ifficulty": "Select Difficulty",
+            "easy": "Easy",
+            "medium": "Medium",
+            "hard": "Hard",
+            "time": "Time",
+            "mistakes": "Mistakes",
+            "game_completed": "Game Completed",
+            "your_score": "Your score",
+            "save_score": "Save Score",
+            "dialog_title": "Congratulations",
+            "dialog_description": "You've completed the Sudoku puzzle",
+            "seconds": "seconds",
+            "button_saving": "Saving",
+            "button_save": "Claim Reward"
           },
           "chess": {
             "name": "Chess",
@@ -186,6 +208,15 @@
         "chain": "Chain",
         "public_key": "Public Key"
       }
+    },
+    "setting": {
+      "settings": "Settings",
+      "language": "Language",
+      "terms": "Terms & Privacy Policy",
+      "help": "Help & Support",
+      "about": "About",
+      "language_setting": "Language Settings",
+      "language_description": "Choose your preferred language"
     },
     "navbar": {
       "home": "Home",

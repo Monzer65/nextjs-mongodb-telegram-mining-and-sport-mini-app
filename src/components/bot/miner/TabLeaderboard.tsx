@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -18,13 +18,26 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useInitData } from "@telegram-apps/sdk-react";
-import { useLeaderboard } from "@/hooks/useLeaderboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Trophy, Medal, Search, RefreshCw, Loader2 } from "lucide-react";
 import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
+import { useQuery } from "@tanstack/react-query";
+
+async function fetchLeaderboard(telegramId: number | null, limit: number) {
+  if (!telegramId) {
+    return null;
+  }
+  const response = await fetch(
+    `/api/users/leaderboard?telegramId=${telegramId}&limit=${limit}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch leaderboard");
+  }
+  return response.json();
+}
 
 export default function TabLeaderboard({
   dictionary,
@@ -37,9 +50,27 @@ export default function TabLeaderboard({
 }) {
   const initData = useInitData();
   const telegramId = initData?.user?.id || null;
-  const { leaderboard, userRank, userScore, isLoading, isError, refetch } =
-    useLeaderboard(telegramId);
+  let limit: number = 10;
+
+  const { data, isError, isLoading, refetch } = useQuery({
+    queryKey: ["leaderboard", telegramId, limit],
+    queryFn: () => fetchLeaderboard(telegramId, limit),
+    enabled: !!telegramId,
+    retry: 3,
+  });
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [userRank, setUserRank] = useState();
+  const [userScore, setUserScore] = useState();
+
+  useEffect(() => {
+    if (data) {
+      setLeaderboard(data.leaderboard);
+      setUserRank(data.userRank);
+      setUserScore(data.userScore);
+    }
+  }, [data]);
 
   const filteredLeaderboard = leaderboard.filter((player: any) =>
     player.username?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -121,7 +152,7 @@ export default function TabLeaderboard({
               <TableBody>
                 {filteredLeaderboard.map((player: any, index: number) => {
                   // If the user's rank is greater than 10, add a separator before displaying the user.
-                  if (userRank > 10 && index === 10) {
+                  if (userRank && userRank > 10 && index === 10) {
                     return (
                       <React.Fragment key='user-rank-separator'>
                         <TableRow className='hover:bg-muted/50'>

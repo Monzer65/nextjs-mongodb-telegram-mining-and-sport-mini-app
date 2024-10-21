@@ -225,7 +225,7 @@ export default function TabBoosts({
 
           if (booster.id === "fortune") {
             return (
-              <Card className='w-full max-w-sm mx-auto'>
+              <Card key={booster.id} className='w-full max-w-sm mx-auto'>
                 <CardHeader>
                   <CardTitle>{dictionary["fortune"]}</CardTitle>
                   <CardDescription>{dictionary.free}</CardDescription>

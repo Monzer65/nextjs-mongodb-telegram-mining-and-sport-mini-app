@@ -12,12 +12,10 @@ export async function POST(
 
     if (
       boosterId == "fortune" &&
-      !randomMultiplier &&
-      randomMultiplier > 10 &&
-      randomMultiplier <= 0
+      (!randomMultiplier || randomMultiplier > 10 || randomMultiplier <= 0)
     ) {
       return NextResponse.json(
-        { success: false, error: "Random multiplier must be provided" },
+        { success: false, error: "Random multiplier must be between 1 and 10" },
         { status: 404 }
       );
     }

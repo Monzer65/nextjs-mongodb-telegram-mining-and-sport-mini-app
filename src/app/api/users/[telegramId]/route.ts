@@ -105,7 +105,7 @@ export async function GET(
 
     // Add the permanent power booster's multiplier
     const powerMultiplier = user.boosters.power.multiplier;
-    effectiveMiningSpeed *= powerMultiplier;
+    effectiveMiningSpeed += powerMultiplier;
 
     // Calculate the multiplier effect of each active booster that has not expired
     user.boosters.activeBoosters.forEach((booster) => {

@@ -220,14 +220,6 @@ function RootInner({ children }: PropsWithChildren) {
   const manifestUrl = useMemo(() => {
     return new URL("tonconnect-manifest.json", window.location.href).toString();
   }, []);
-  // use the following in manifest json file:
-  //   {
-  //     "url": "https://ton-connect.github.io/demo-dapp-with-wallet/",
-  //     "name": "Demo Dapp with wallet",
-  //     "iconUrl": "https://ton-connect.github.io/demo-dapp-with-wallet/apple-touch-icon.png",
-  //     "termsOfUseUrl": "https://ton-connect.github.io/demo-dapp-with-wallet/terms-of-use.txt",
-  //     "privacyPolicyUrl": "https://ton-connect.github.io/demo-dapp-with-wallet/privacy-policy.txt"
-  // }
 
   // Enable debug mode to see all the methods sent and events received.
   useEffect(() => {
@@ -240,7 +232,7 @@ function RootInner({ children }: PropsWithChildren) {
     <TonConnectUIProvider manifestUrl={manifestUrl}>
       <SDKProvider acceptCustomStyles debug={debug}>
         <QueryClientProvider client={queryClient}>
-          <App>{children}</App>{" "}
+          <App>{children}</App>
         </QueryClientProvider>
       </SDKProvider>
     </TonConnectUIProvider>

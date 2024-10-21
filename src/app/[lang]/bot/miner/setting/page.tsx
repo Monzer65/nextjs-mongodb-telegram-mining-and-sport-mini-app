@@ -11,16 +11,18 @@ const Setting = async ({ params: { lang } }: { params: { lang: Locale } }) => {
   return (
     <div className='min-h-screen flex flex-col'>
       <div className='flex justify-between items-center p-4 '>
-        <Link href={`/${lang}/bot/clicker`}>
-          <span className='sr-only'>Back to clicker page</span>
+        <Link href={`/${lang}/bot/miner`}>
+          <span className='sr-only'>Back to miner page</span>
           <ArrowLeft className={lang !== "en" ? "rotate-180" : "rotate-0"} />
         </Link>
-        <h1 className='text-3xl font-bold mb-6'>Settings</h1>
+        <h1 className='text-3xl font-bold mb-6'>
+          {dictionary.miner.setting.settings}
+        </h1>
       </div>
 
-      <SettingContent dictionary={dictionary["bot-home-page"]} />
+      <SettingContent dictionary={dictionary["miner"]["setting"]} lang={lang} />
 
-      <NavigationTabBar />
+      <NavigationTabBar dictionary={dictionary.miner.navbar} lang={lang} />
     </div>
   );
 };

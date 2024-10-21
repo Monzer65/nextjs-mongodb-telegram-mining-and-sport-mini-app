@@ -154,7 +154,6 @@ export default function TabTasks({
     <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader className='border-b'>
         <CardDescription>{dictionary["header-description"]}</CardDescription>
-        {/* <CardTitle className='text-2xl font-bold mb-4'>Tasks</CardTitle> */}
       </CardHeader>
       <CardContent className='space-y-6 pt-6'>
         <Select

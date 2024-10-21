@@ -18,7 +18,7 @@ type Game = {
   id: string;
   name: string;
   description: string;
-  component: React.ComponentType;
+  component: React.ComponentType<{ dictionary: any }>;
 };
 
 const TabGames = ({
@@ -88,7 +88,7 @@ const TabGames = ({
               {dictionary.back_button}
             </Button>
             <div className='mt-4'>
-              <selectedGame.component />
+              <selectedGame.component dictionary={dictionary} />
             </div>
           </div>
         ) : (

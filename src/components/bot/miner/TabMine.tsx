@@ -15,6 +15,7 @@ import { User } from "@/lib/types";
 import { fetchUserData, formatTime } from "@/lib/utils";
 import ProgressCircle from "./ProgressCircle";
 import AnimatedRipple from "./Ripple";
+import { Locale } from "@/i18n-config";
 
 const startMining = async (
   telegramId: number | undefined
@@ -30,10 +31,12 @@ const startMining = async (
 
 export default function TabMine({
   dictionary,
+  lang,
 }: {
   dictionary: Awaited<
     ReturnType<typeof getDictionary>
   >["miner"]["tabs"]["mine-tab"];
+  lang: Locale;
 }) {
   const initTelData = useInitData();
   const telegramId = initTelData?.user?.id;
@@ -69,7 +72,7 @@ export default function TabMine({
       // Calculate the permanent speed (based on power booster)
       const baseSpeed = user.miningSpeed;
       const powerMultiplier = user.boosters.power.multiplier;
-      const permanentSpeedValue = baseSpeed * powerMultiplier;
+      const permanentSpeedValue = baseSpeed + powerMultiplier;
       setPermanentSpeed(permanentSpeedValue);
 
       // Calculate the temporary speed (multipliers from active boosters)
@@ -81,7 +84,7 @@ export default function TabMine({
         }
       });
 
-      const temporarySpeedValue = baseSpeed * (temporarySpeedMultiplier - 1);
+      const temporarySpeedValue = baseSpeed * temporarySpeedMultiplier;
       setTemporarySpeed(temporarySpeedValue);
 
       const combinedSpeed = permanentSpeedValue + temporarySpeedValue;
@@ -206,14 +209,16 @@ export default function TabMine({
 
 function SpeedCard({ title, speed }: { title: string; speed: number }) {
   return (
-    <Card className='overflow-hidden'>
-      <CardHeader className='bg-primary/10 py-2'>
-        <CardTitle className='text-center text-sm font-medium'>
+    <Card className='overflow-hidden truncate'>
+      <CardHeader className='bg-primary/10 py-1 sm:py-2 md:py-3'>
+        <CardTitle className='text-center text-sm md:text-base sm:text-xs font-medium'>
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className='p-4'>
-        <div className='text-center text-2xl font-bold'>{speed.toFixed(2)}</div>
+      <CardContent className='p-1 sm:p-3 md:p-4'>
+        <div className='text-center sm:text-xl md:text-2xl font-bold'>
+          {speed.toFixed(2)}X
+        </div>
       </CardContent>
     </Card>
   );
