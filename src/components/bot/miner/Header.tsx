@@ -13,6 +13,7 @@ export default function Header({
 }) {
   const { data } = useQuery<{ user: User }>({
     queryKey: ["user"],
+    refetchOnWindowFocus: false,
     refetchInterval: 60000,
   });
 
@@ -47,9 +48,8 @@ export default function Header({
     setLevel(newLevel);
   }, [score]);
 
-  console.log(score);
   return (
-    <header className='bg-gray-900 text-white p-4 flex justify-between items-center'>
+    <header className='bg-gray-900 text-white p-4 flex justify-between items-center sticky top-0 z-10'>
       <div>
         <h2 className='text-xl font-semibold leading-none tracking-tight text-purple-800'>
           ScoreBoard Miner

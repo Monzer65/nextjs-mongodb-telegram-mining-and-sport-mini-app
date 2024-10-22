@@ -9,6 +9,7 @@ import TabBoosts from "./TabBoosts";
 import TabGames from "./TabGames";
 import { getDictionary } from "@/get-dictionary";
 import { Locale } from "@/i18n-config";
+import clsx from "clsx";
 
 type TabValue = "tasks" | "referrals" | "boosts" | "mini-games";
 
@@ -68,29 +69,38 @@ export default function TabEarn({
     <Tabs
       value={activeTab}
       onValueChange={(value) => setActiveTab(value as TabValue)}
-      className='w-full'
+      className='flex-1 p-2 sm:p-4 mb-16'
       dir={lang === "en" ? "ltr" : "rtl"}
     >
-      <TabsList className='grid w-full grid-cols-2 sm:grid-cols-4 gap-1 bg-gray-100 p-1 rounded-lg'>
+      <TabsList className='flex justify-between sticky top-[110px] bg-white shadow-md rounded-lg z-10 p-1 overflow-x-auto'>
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className={`flex flex-col items-center justify-center text-xs sm:text-sm md:flex-row md:gap-2 p-2 rounded-md transition-all duration-200 ${
+            className={clsx(
+              "flex items-center justify-center text-[10px] xs:text-xs sm:text-sm py-1 xs:py-2 px-1 xs:px-2 sm:px-3 rounded-md transition-all duration-200 whitespace-nowrap",
               activeTab === tab.value
-                ? `${tab.color} bg-white shadow-md`
-                : "text-gray-600 hover:bg-gray-200"
-            }`}
+                ? `${tab.color} bg-gray-100 shadow-sm`
+                : "text-gray-600 hover:bg-gray-100"
+            )}
           >
             <tab.icon
-              className={`h-5 w-5 ${activeTab === tab.value ? tab.color : ""}`}
+              className={clsx(
+                "h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5",
+                lang === "en" ? "mr-1 xs:mr-2" : "ml-1 xs:ml-2",
+                activeTab === tab.value ? tab.color : ""
+              )}
             />
-            <span className='text-center font-medium'>{tab.title}</span>
+            <span className='font-medium'>{tab.title}</span>
           </TabsTrigger>
         ))}
       </TabsList>
       {tabs.map((tab) => (
-        <TabsContent key={tab.value} value={tab.value}>
+        <TabsContent
+          key={tab.value}
+          value={tab.value}
+          className='flex-1 mt-4 sm:mt-6'
+        >
           <tab.component
             dictionary={
               dictionary[`${tab.value}-tab` as keyof DictionaryType] as any

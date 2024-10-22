@@ -55,6 +55,8 @@ export default function TabLeaderboard({
   const { data, isError, isLoading, refetch } = useQuery({
     queryKey: ["leaderboard", telegramId, limit],
     queryFn: () => fetchLeaderboard(telegramId, limit),
+    refetchOnWindowFocus: false,
+    refetchInterval: 60000,
     enabled: !!telegramId,
     retry: 3,
   });

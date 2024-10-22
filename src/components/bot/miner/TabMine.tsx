@@ -51,6 +51,7 @@ export default function TabMine({
   const { data, isLoading, isError, refetch } = useQuery<{ user: User }>({
     queryKey: ["user"],
     queryFn: () => fetchUserData(telegramId),
+    refetchOnWindowFocus: false,
     refetchInterval: 60000,
   });
 

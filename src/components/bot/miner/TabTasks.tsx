@@ -67,6 +67,8 @@ export default function TabTasks({
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: () => fetchUserData(telegramId),
+    refetchOnWindowFocus: false,
+    refetchInterval: 60000,
   });
 
   useEffect(() => {
@@ -99,12 +101,13 @@ export default function TabTasks({
         setCompletedTasks((prev) => new Set(prev).add(taskId));
         queryClient.invalidateQueries({ queryKey: ["user"] });
         toast({
-          title: `${dictionary["on-success-toast"]["no-error"].title}`,
+          // title: `${dictionary["on-success-toast"]["no-error"].title}`,
           description: `${dictionary["on-success-toast"]["no-error"].description}`,
+          className: "bg-green-600 text-white",
         });
       } else {
         toast({
-          title: `${dictionary["on-success-toast"]["with-error"].title}`,
+          // title: `${dictionary["on-success-toast"]["with-error"].title}`,
           description: `${dictionary["on-success-toast"]["with-error"].description}`,
           variant: "destructive",
         });

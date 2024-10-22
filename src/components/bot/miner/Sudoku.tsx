@@ -110,9 +110,10 @@ export default function SudokuGame({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast({
-        title: `${dictionary.sudoku["toast-success"].title}`,
+        // title: `${dictionary.sudoku["toast-success"].title}`,
         description: `${dictionary.sudoku["toast-success"].description}`,
         duration: 3000,
+        className: "bg-green-600 text-white",
       });
       setShowRewardModal(false);
       resetGame();
@@ -120,7 +121,7 @@ export default function SudokuGame({
     onError: (error: Error) => {
       console.error("Error updating score:", error);
       toast({
-        title: `${dictionary.sudoku["toast-failed"].title}`,
+        // title: `${dictionary.sudoku["toast-failed"].title}`,
         description: `${dictionary.sudoku["toast-failed"].description}`,
         variant: "destructive",
         duration: 3000,

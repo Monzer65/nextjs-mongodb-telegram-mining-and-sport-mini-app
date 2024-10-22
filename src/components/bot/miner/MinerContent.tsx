@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import TabMine from "./TabMine";
 import TabEarn from "./TabEarn";
@@ -74,24 +75,27 @@ export default function MinerContent({
       <Tabs
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as TabValue)}
-        className='flex-1 p-4 mb-16'
+        className='flex-1 p-2 sm:p-4'
         dir={lang === "en" ? "ltr" : "rtl"}
       >
-        <TabsList className='flex justify-between sticky top-0 bg-white shadow-md rounded-lg z-10 p-1'>
+        <TabsList className='flex justify-between sticky top-[72px] bg-white shadow-md rounded-lg z-10 p-1 overflow-x-auto'>
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className={`flex items-center justify-center text-xs sm:text-sm py-2 px-3 rounded-md transition-all duration-200 ${
+              className={clsx(
+                "flex items-center justify-center text-[10px] xs:text-xs sm:text-sm py-1 xs:py-2 px-1 xs:px-2 sm:px-3 rounded-md transition-all duration-200 whitespace-nowrap",
                 activeTab === tab.value
                   ? `${tab.color} bg-gray-100 shadow-sm`
                   : "text-gray-600 hover:bg-gray-100"
-              }`}
+              )}
             >
               <tab.icon
-                className={`h-5 w-5 ${lang === "en" ? "mr-2" : "ml-2"} ${
+                className={clsx(
+                  "h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5",
+                  lang === "en" ? "mr-1 xs:mr-2" : "ml-1 xs:ml-2",
                   activeTab === tab.value ? tab.color : ""
-                }`}
+                )}
               />
               <span className='font-medium'>{tab.title}</span>
             </TabsTrigger>
@@ -102,7 +106,7 @@ export default function MinerContent({
           <TabsContent
             key={tab.value}
             value={tab.value}
-            className='flex-1 mt-6'
+            className='flex-1 mt-4 sm:mt-6'
           >
             <tab.component
               dictionary={

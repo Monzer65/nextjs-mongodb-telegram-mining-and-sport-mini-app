@@ -48,6 +48,8 @@ export default function TabReferrals({
       }
       return response.json();
     },
+    refetchOnWindowFocus: false,
+    refetchInterval: 60000,
     enabled: !!telegramId,
   });
 
@@ -56,8 +58,9 @@ export default function TabReferrals({
     try {
       await navigator.clipboard.writeText(referralLink);
       toast({
-        title: `${dictionary["toast-success-copy"].title}`,
+        // title: `${dictionary["toast-success-copy"].title}`,
         description: `${dictionary["toast-success-copy"].description}`,
+        className: "bg-green-600 text-white",
       });
     } catch (error) {
       // Fallback: Focus and select the input field for manual copy
@@ -69,7 +72,7 @@ export default function TabReferrals({
         input.select();
       }
       toast({
-        title: `${dictionary["toast-failed-copy"].title}`,
+        // title: `${dictionary["toast-failed-copy"].title}`,
         description: `${dictionary["toast-failed-copy"].description}`,
         variant: "destructive",
       });

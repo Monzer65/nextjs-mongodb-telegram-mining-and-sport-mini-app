@@ -94,13 +94,14 @@ export default function TabBoosts({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast({
-        title: dictionary["toast-success-active"].title,
+        // title: dictionary["toast-success-active"].title,
         description: dictionary["toast-success-active"].description,
+        className: "bg-green-600 text-white",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: dictionary["toast-failed-active"].title,
+        // title: dictionary["toast-failed-active"].title,
         description: `${dictionary["toast-failed-active"].description}: ${error.message}`,
         variant: "destructive",
         duration: 5000,
