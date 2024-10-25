@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { i18n, Locale } from "@/i18n-config";
 import { Check, ChevronDown, Globe } from "lucide-react";
@@ -31,12 +31,15 @@ export default function LocaleSwitcher() {
     },
   });
 
-  const redirectedPathName = (locale: Locale) => {
-    if (!pathName) return "/";
-    const segments = pathName.split("/");
-    segments[1] = locale;
-    return segments.join("/");
-  };
+  const redirectedPathName = useCallback(
+    (locale: Locale) => {
+      if (!pathName) return "/";
+      const segments = pathName.split("/");
+      segments[1] = locale;
+      return segments.join("/");
+    },
+    [pathName]
+  );
 
   const localeLabels: {
     [key in Locale]: { name: string; nativeName: string };
@@ -48,11 +51,22 @@ export default function LocaleSwitcher() {
 
   useEffect(() => {
     if (!pathName) return;
+
+    // Get the locale from cookie, URL, or fallback to default "en"
     const storedLocale = getCookie("userLocale") as Locale;
     const pathLocale = (pathName.split("/")[1] as Locale) || "en";
+
+    // Set the initial locale based on cookie > URL
     const initialLocale = storedLocale || pathLocale;
+
+    // Update the current locale in the component state
     setCurrentLocale(initialLocale);
-  }, [pathName]);
+
+    // Update the URL if the cookie is present but the URL is not aligned
+    if (storedLocale && storedLocale !== pathLocale) {
+      router.replace(redirectedPathName(storedLocale));
+    }
+  }, [pathName, router, redirectedPathName]);
 
   const handleLocaleChange = async (locale: Locale) => {
     try {

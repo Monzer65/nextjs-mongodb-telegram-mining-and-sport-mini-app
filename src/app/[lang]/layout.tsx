@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/_assets/globals.css";
-import { merriWeatherForBody } from "@/app/_assets/fonts";
+import { vazirmatn } from "@/app/_assets/fonts";
 import { i18n, type Locale } from "../../i18n-config";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 
   return (
     <html lang={params.lang} dir={textDirection}>
-      <body className={merriWeatherForBody.className}>
+      <body className={vazirmatn.className}>
         {children}
         <Toaster />
       </body>

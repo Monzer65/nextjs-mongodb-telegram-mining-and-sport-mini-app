@@ -220,26 +220,28 @@ export async function POST(
 
     if (result.insertedId) {
       // If a valid referral code was used, update the referrer's score
-      if (referralCode) {
+
+      const referrerTelegramId = Number(referralCode);
+      if (!isNaN(referrerTelegramId) && referralCode) {
         const referrer = await db
           .collection("telegramUsers")
-          .findOne({ telegramId: Number(referralCode) });
+          .findOne({ telegramId: referrerTelegramId });
 
         if (referrer) {
           const isReferralAlreadyAdded =
             referrer.referrals.includes(telegramId);
-
           if (!isReferralAlreadyAdded) {
             await db.collection("telegramUsers").updateOne(
-              { telegramId: Number(referralCode) },
+              { telegramId: referrerTelegramId },
               {
                 $inc: { score: 100 },
-                $addToSet: { referrals: telegramId },
+                $addToSet: { referrals: telegramId.toString() },
               }
             );
           }
         }
       }
+
       return NextResponse.json(
         { success: true, data: newUser },
         { status: 201 }

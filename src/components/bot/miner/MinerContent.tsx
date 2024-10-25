@@ -75,7 +75,7 @@ export default function MinerContent({
       <Tabs
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as TabValue)}
-        className='flex-1 p-2 sm:p-4'
+        className='flex-1 p-2 sm:p-4 mb-16'
         dir={lang === "en" ? "ltr" : "rtl"}
       >
         <TabsList className='flex justify-between sticky top-[72px] bg-white shadow-md rounded-lg z-10 p-1 overflow-x-auto'>
