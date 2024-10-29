@@ -8,7 +8,7 @@ export type User = {
   score: number;
   lastMiningStart: Timestamp;
   referredBy: number | null;
-  referrals: string[];
+  referrals: number[];
   level: number;
   isMining: boolean;
   miningSpeed: number;

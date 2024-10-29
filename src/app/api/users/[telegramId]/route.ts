@@ -193,7 +193,7 @@ export async function POST(
       name,
       username,
       telegramId,
-      referredBy: Number(referralCode) || null, // Default to null if no referral code
+      referredBy: Number(referralCode), // Default to null if no referral code
       referrals: [], // New users haven't referred anyone yet
       score: 0, // Default score is 0
       level: 1, // Starting at level 1 as a string (match type)
@@ -221,21 +221,22 @@ export async function POST(
     if (result.insertedId) {
       // If a valid referral code was used, update the referrer's score
 
-      const referrerTelegramId = Number(referralCode);
-      if (!isNaN(referrerTelegramId) && referralCode) {
+      if (referralCode) {
+        const referrerTelegramId = Number(referralCode);
         const referrer = await db
           .collection("telegramUsers")
           .findOne({ telegramId: referrerTelegramId });
 
         if (referrer) {
-          const isReferralAlreadyAdded =
-            referrer.referrals.includes(telegramId);
+          const isReferralAlreadyAdded = referrer.referrals.includes(
+            Number(telegramId)
+          );
           if (!isReferralAlreadyAdded) {
             await db.collection("telegramUsers").updateOne(
               { telegramId: referrerTelegramId },
               {
                 $inc: { score: 100 },
-                $addToSet: { referrals: telegramId.toString() },
+                $addToSet: { referrals: Number(telegramId) },
               }
             );
           }
