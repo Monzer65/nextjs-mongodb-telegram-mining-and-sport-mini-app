@@ -91,7 +91,12 @@ export default function TabTasks({
       const response = await fetch("/api/users/tasks/membership", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: telegramId, chatId, taskId, points }),
+        body: JSON.stringify({
+          userId: Number(telegramId),
+          chatId,
+          taskId,
+          points,
+        }),
       });
       const data = await response.json();
       return data.isMember;

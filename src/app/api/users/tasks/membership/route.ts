@@ -16,12 +16,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const { userId, chatId, taskId, points } = await request.json();
-    console.log("Received request payload:", {
-      userId,
-      chatId,
-      taskId,
-      points,
-    });
 
     if (!userId || !chatId || !taskId || !points) {
       console.warn("Missing parameters:", { userId, chatId, taskId, points });
@@ -44,7 +38,6 @@ export async function POST(request: NextRequest) {
     });
 
     const data: TelegramResponse = await response.json();
-    console.log("Telegram API response:", data);
 
     // Check if the API response is OK and if it contains result data
     if (data.ok && data.result) {
@@ -58,7 +51,6 @@ export async function POST(request: NextRequest) {
 
       if (isMember) {
         const { db } = await connectToDatabase();
-        console.log("Connected to database. Updating user data.");
 
         // Update the user with the new task ID in the database
         const updateResult = await db
@@ -67,7 +59,6 @@ export async function POST(request: NextRequest) {
             { telegramId: userId },
             { $addToSet: { tasks: taskId }, $inc: { score: points } }
           );
-        console.log("Database update result:", updateResult);
 
         if (updateResult.matchedCount === 0) {
           console.warn("User not found, task not added");
@@ -77,7 +68,6 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        console.log("User data updated successfully.");
         return NextResponse.json({ success: true, isMember });
       } else {
         console.warn(
