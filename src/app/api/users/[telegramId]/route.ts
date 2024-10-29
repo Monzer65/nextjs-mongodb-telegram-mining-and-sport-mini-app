@@ -172,7 +172,7 @@ export async function POST(
   try {
     const { name, username, referralCode } = await request.json();
     const telegramId = Number(params.telegramId);
-
+    console.log("referralCode", referralCode);
     const { db } = await connectToDatabase();
 
     // Check if the user already exists

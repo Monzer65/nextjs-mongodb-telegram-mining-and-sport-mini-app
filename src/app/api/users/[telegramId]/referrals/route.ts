@@ -25,6 +25,7 @@ export async function GET(
 
     const formattedReferrals = referrals.map((ref) => ({
       telegramId: ref.telegramId,
+      name: ref.name,
       username: ref.username,
       joinDate: ref.createdAt.toISOString().split("T")[0], // Format date as YYYY-MM-DD
       tokensEarned: 100,

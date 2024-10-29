@@ -128,7 +128,7 @@ function App(props: PropsWithChildren) {
   }`.trim();
   const username = lp.initData?.user?.username ?? "";
   const telegramId = lp.initData?.user?.id;
-  const ref = searchParams.get("ref");
+  const ref = searchParams.get("referralCode");
 
   const {
     data: userData,
