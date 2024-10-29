@@ -128,8 +128,9 @@ function App(props: PropsWithChildren) {
   }`.trim();
   const username = lp.initData?.user?.username ?? "";
   const telegramId = lp.initData?.user?.id;
-  const ref = searchParams.get("referralCode");
-
+  const ref = searchParams.get("startapp");
+  console.log("lp", lp);
+  console.log("lp.startParam", lp.startParam);
   const {
     data: userData,
     isLoading,
@@ -149,7 +150,11 @@ function App(props: PropsWithChildren) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: fullname, username, referralCode: ref }),
+        body: JSON.stringify({
+          name: fullname,
+          username,
+          startapp: ref || lp.startParam,
+        }),
       });
       if (!response.ok) throw new Error("Failed to create user");
       return response.json();

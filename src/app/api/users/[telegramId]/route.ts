@@ -170,9 +170,9 @@ export async function POST(
   { params }: { params: { telegramId: string } }
 ) {
   try {
-    const { name, username, referralCode } = await request.json();
+    const { name, username, startapp } = await request.json();
     const telegramId = Number(params.telegramId);
-    console.log("referralCode", referralCode);
+    console.log("startapp", startapp);
     const { db } = await connectToDatabase();
 
     // Check if the user already exists
@@ -193,7 +193,7 @@ export async function POST(
       name,
       username,
       telegramId,
-      referredBy: Number(referralCode), // Default to null if no referral code
+      referredBy: Number(startapp), // Default to null if no referral code
       referrals: [], // New users haven't referred anyone yet
       score: 0, // Default score is 0
       level: 1, // Starting at level 1 as a string (match type)
@@ -221,8 +221,8 @@ export async function POST(
     if (result.insertedId) {
       // If a valid referral code was used, update the referrer's score
 
-      if (referralCode) {
-        const referrerTelegramId = Number(referralCode);
+      if (startapp) {
+        const referrerTelegramId = Number(startapp);
         const referrer = await db
           .collection("telegramUsers")
           .findOne({ telegramId: referrerTelegramId });

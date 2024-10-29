@@ -54,7 +54,7 @@ export default function TabReferrals({
   });
 
   const handleCopyClick = async () => {
-    const referralLink = `https://t.me/GoalRushBot/ScoreBoard?referralCode=${telegramId}`;
+    const referralLink = `https://t.me/GoalRushBot/ScoreBoard?startapp=${telegramId}`;
     try {
       await navigator.clipboard.writeText(referralLink);
       toast({
@@ -80,7 +80,7 @@ export default function TabReferrals({
   };
 
   const handleShareClick = () => {
-    const referralLink = `https://t.me/GoalRushBot/ScoreBoard?referralCode=${telegramId}`;
+    const referralLink = `https://t.me/GoalRushBot/ScoreBoard?startapp=${telegramId}`;
 
     // Use the Telegram WebApp API to share a message with the referral link
     utils.openTelegramLink(
@@ -126,7 +126,7 @@ export default function TabReferrals({
           <h3 className='text-lg font-semibold'>{dictionary["link-title"]}</h3>
           <div className='flex items-center space-x-2' dir='ltr'>
             <Input
-              value={`https://t.me/GoalRushBot/ScoreBoard?referralCode=${telegramId}`}
+              value={`https://t.me/GoalRushBot/ScoreBoard?startapp=${telegramId}`}
               readOnly
               id='referral-link-input'
               className='flex-grow'
