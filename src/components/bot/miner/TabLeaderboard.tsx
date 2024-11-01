@@ -75,7 +75,7 @@ export default function TabLeaderboard({
   }, [data]);
 
   const filteredLeaderboard = leaderboard.filter((player: any) =>
-    player.username?.toLowerCase().includes(searchTerm.toLowerCase())
+    player.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getRankIcon = (rank: number) => {
@@ -189,14 +189,14 @@ export default function TabLeaderboard({
                                   src={
                                     player.photoUrl || "/placeholder-user.jpg"
                                   }
-                                  alt={`@${player.username}`}
+                                  alt={`@${player.name}`}
                                 />
                                 <AvatarFallback>
                                   {player.name?.slice(0, 2)}
                                 </AvatarFallback>
                               </Avatar>
                               <span className='font-medium'>
-                                {player.username || "Unknown Player"}
+                                {player.name || "Unknown Player"}
                               </span>
                             </div>
                           </TableCell>
@@ -236,14 +236,14 @@ export default function TabLeaderboard({
                             <Avatar className='w-8 h-8'>
                               <AvatarImage
                                 src={player.photoUrl || "/placeholder-user.jpg"}
-                                alt={`@${player.username}`}
+                                alt={`@${player.name}`}
                               />
                               <AvatarFallback>
                                 {player.name?.slice(0, 2)}
                               </AvatarFallback>
                             </Avatar>
                             <span className='font-medium'>
-                              {player.username || "Unknown Player"}
+                              {player.name || "Unknown Player"}
                             </span>
                           </div>
                         </TableCell>

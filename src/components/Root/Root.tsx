@@ -2,6 +2,7 @@
 
 import {
   type PropsWithChildren,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -78,9 +79,31 @@ function App(props: PropsWithChildren) {
     return viewport && bindViewportCSSVars(viewport);
   }, [viewport]);
 
+  function getCookie(name: string): string | undefined {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(";").shift();
+  }
+
+  const redirectedPathName = useCallback(
+    (locale: Locale) => {
+      if (!pathname) return "/";
+      const segments = pathname.split("/");
+      segments[1] = locale;
+      return segments.join("/");
+    },
+    [pathname]
+  );
+
   useEffect(() => {
+    const storedLocale = getCookie("userLocale") as Locale;
     const locale = pathname.split("/")[1] as Locale;
+    const initialLocale = storedLocale || locale;
     const shouldShowBackButton = pathname !== `/${locale}/bot/miner`;
+
+    if (storedLocale && storedLocale !== locale) {
+      router.replace(redirectedPathName(storedLocale));
+    }
 
     if (shouldShowBackButton) {
       backButton.show();
@@ -92,7 +115,7 @@ function App(props: PropsWithChildren) {
     return () => {
       backButton.hide();
     };
-  }, [pathname, backButton, router]);
+  }, [pathname, backButton, router, redirectedPathName]);
 
   // if (lp.platform === "tdesktop") {
   //   return (

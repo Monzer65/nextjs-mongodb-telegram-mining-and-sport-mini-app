@@ -11,8 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLaunchParams } from "@telegram-apps/sdk-react";
 
 export default function LocaleSwitcher() {
   const pathName = usePathname();
@@ -37,25 +35,6 @@ export default function LocaleSwitcher() {
     fa: { name: "Farsi", nativeName: "فارسی" },
     ckb: { name: "Kurdish", nativeName: "کوردی" },
   };
-
-  useEffect(() => {
-    if (!pathName) return;
-
-    // Get the locale from cookie, URL, or fallback to default "en"
-    const storedLocale = getCookie("userLocale") as Locale;
-    const pathLocale = (pathName.split("/")[1] as Locale) || "en";
-
-    // Set the initial locale based on cookie > URL
-    const initialLocale = storedLocale || pathLocale;
-
-    // Update the current locale in the component state
-    setCurrentLocale(initialLocale);
-
-    // Update the URL if the cookie is present but the URL is not aligned
-    if (storedLocale && storedLocale !== pathLocale) {
-      router.replace(redirectedPathName(storedLocale));
-    }
-  }, [pathName, router, redirectedPathName]);
 
   const handleLocaleChange = async (locale: Locale) => {
     try {
