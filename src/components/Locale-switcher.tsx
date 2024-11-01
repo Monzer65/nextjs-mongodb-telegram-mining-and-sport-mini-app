@@ -19,17 +19,6 @@ export default function LocaleSwitcher() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLocale, setCurrentLocale] = useState<Locale>("en");
-  const queryClient = useQueryClient();
-  const lp = useLaunchParams();
-  const telegramId = lp.initData?.user?.id;
-
-  const mutation = useMutation({
-    mutationFn: ({ locale }: { locale: Locale }) =>
-      updateUserLocale(locale, telegramId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-    },
-  });
 
   const redirectedPathName = useCallback(
     (locale: Locale) => {
@@ -72,7 +61,6 @@ export default function LocaleSwitcher() {
     try {
       setCookie("userLocale", locale, 365);
       setCurrentLocale(locale);
-      await mutation.mutateAsync({ locale });
       router.replace(redirectedPathName(locale));
     } catch (err) {
       console.error("Failed to update locale:", err);
@@ -135,21 +123,4 @@ function setCookie(name: string, value: string, days: number) {
   date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
   const expires = `expires=${date.toUTCString()}`;
   document.cookie = `${name}=${value};${expires};path=/`;
-}
-
-async function updateUserLocale(
-  locale: Locale,
-  telegramId: number | undefined
-): Promise<void> {
-  if (!telegramId) return;
-  const response = await fetch(`/api/users/${telegramId}/locale`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ locale }),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to update user locale");
-  }
 }

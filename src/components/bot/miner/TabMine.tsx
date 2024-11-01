@@ -77,15 +77,15 @@ export default function TabMine({
       setPermanentSpeed(permanentSpeedValue);
 
       // Calculate the temporary speed (multipliers from active boosters)
-      let temporarySpeedMultiplier = 1;
+      let temporarySpeedMultiplier = 0;
       const now = Date.now();
       user.boosters.activeBoosters.forEach((booster) => {
         if (booster.expiresAt && new Date(booster.expiresAt).getTime() > now) {
-          temporarySpeedMultiplier *= booster.multiplier;
+          temporarySpeedMultiplier += booster.multiplier;
         }
       });
 
-      const temporarySpeedValue = baseSpeed * temporarySpeedMultiplier;
+      const temporarySpeedValue = temporarySpeedMultiplier;
       setTemporarySpeed(temporarySpeedValue);
 
       const combinedSpeed = permanentSpeedValue + temporarySpeedValue;

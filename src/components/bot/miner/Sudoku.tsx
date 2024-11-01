@@ -29,9 +29,9 @@ type Board = Cell[];
 type Difficulty = "easy" | "medium" | "hard";
 
 const difficultyLevels: Record<Difficulty, number> = {
-  easy: 1,
-  medium: 45,
-  hard: 55,
+  easy: 45,
+  medium: 55,
+  hard: 70,
 };
 
 const generateSudokuBoard = (difficulty: Difficulty): Board => {
@@ -236,6 +236,7 @@ export default function SudokuGame({
             <div className='text-base md:text-xl font-semibold'>
               {dictionary.sudoku.time}: {time}s
             </div>
+            <p>{dictionary.sudoku[difficulty]}</p>
             <div className='text-base md:text-xl font-semibold text-red-600'>
               {dictionary.sudoku.mistakes}: {mistakes}
             </div>

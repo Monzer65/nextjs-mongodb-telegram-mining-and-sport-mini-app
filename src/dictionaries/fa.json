@@ -35,7 +35,7 @@
         "mining-speed": "سرعت استخراج",
         "speed-boost": "سرعت افزایشی",
         "permanent-speed": "سرعت",
-        "temporary-speed": "بوست موقت",
+        "temporary-speed": "افزاینده موقت",
         "button-start": "شروع کن به استخراج",
         "button-pending": "در‌حال شروع",
         "button-progress": "در حال استخراج",
@@ -105,28 +105,28 @@
         },
         "boosts-tab": {
           "toast-success-active": {
-            "title": "بوستر فعال شد",
-            "description": "بوستر با موفقیت فعال شد"
+            "title": "افزاینده فعال شد",
+            "description": "افزاینده با موفقیت فعال شد"
           },
           "toast-failed-active": {
             "title": "خطا",
             "description": "در فعال‌سازی خطایی رخ داد. بعدا دوباره تلاش کنید"
           },
           "error": {
-            "message": "خطایی در بارگزاری بوسترها رخ داده",
+            "message": "خطایی در بارگزاری افزایندهها رخ داده",
             "try-again-button": "دوباره تلاش کنید"
           },
-          "booster_activated": "بوستر فعال شد",
-          "booster_activated_description": "بوستر شما با موفقیت فعال شد.",
-          "booster_activation_failed": "فعال‌سازی بوستر ناموفق بود",
-          "error_loading_boosters": "خطا در بارگذاری بوسترها. لطفاً دوباره تلاش کنید.",
+          "booster_activated": "افزاینده فعال شد",
+          "booster_activated_description": "افزاینده شما با موفقیت فعال شد.",
+          "booster_activation_failed": "فعال‌سازی افزاینده ناموفق بود",
+          "error_loading_boosters": "خطا در بارگذاری افزایندهها. لطفاً دوباره تلاش کنید.",
           "cost": "هزینه",
           "free": "رایگان",
           "multiplier": "ضریب",
           "random": "تصادفی",
           "active_duration": "مدت زمان فعال بودن",
           "on_cooldown": "در حال انتظار",
-          "header-description": "با فعال کردن بوسترها، سرعت استخراج را افزایش بده",
+          "header-description": "با فعال کردن افزایندهها، سرعت استخراج را افزایش بده",
           "badge-active": "فعال",
           "badge-cooldown": "وقفه",
           "level": "سطح",
@@ -138,11 +138,11 @@
           "activating": "درحال فعالسازی",
           "active": "فعال",
           "cooldown": "زمان انتظار",
-          "disable-already-active": "بوستر قبلا فعال شده",
-          "disable-on-cooldown": "بوستر در حال استراحت است",
+          "disable-already-active": "افزاینده قبلا فعال شده",
+          "disable-on-cooldown": "افزاینده در حال استراحت است",
           "disable-not-enough-points": "امتیاز کافی نیست",
           "disable-start-mining-first": "اول باید استخراج را شروع کنی",
-          "disable-pending": "درحال فعالسازی بوستر",
+          "disable-pending": "درحال فعالسازی افزاینده",
           "speed": "توربوی روزانه",
           "power": "سرعت ثابت",
           "fortune": "گردونه بخت"

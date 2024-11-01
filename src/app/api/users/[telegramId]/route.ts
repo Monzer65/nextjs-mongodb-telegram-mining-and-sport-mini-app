@@ -1,79 +1,21 @@
 // app/api/users/[telegramId]/route.ts
 import { connectToDatabase } from "@/lib/mongodb";
+import { boosters } from "@/lib/static-data";
 import { User } from "@/lib/types";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-// export async function GET(
-//   request: Request,
-//   { params }: { params: { telegramId: string } }
-// ) {
-//   try {
-//     const telegramId = Number(params.telegramId);
-//     const { db } = await connectToDatabase();
-
-//     const user = (await db
-//       .collection("telegramUsers")
-//       .findOne({ telegramId })) as User;
-
-//     if (!user) {
-//       return NextResponse.json(
-//         { success: false, error: "User not found" },
-//         { status: 404 }
-//       );
-//     }
-
-//     const FOUR_HOURS = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
-//     const now = Date.now();
-//     const lastMiningStart = user.lastMiningStart ?? 0;
-//     const timeElapsed = lastMiningStart ? now - lastMiningStart : 0;
-
-//     // If more than 4 hours have elapsed since the last mining start, finalize the score update
-//     if (timeElapsed >= FOUR_HOURS && user.isMining) {
-//       const fullSessionScore = (FOUR_HOURS * 0.001 * user.miningSpeed) / 1000;
-//       const newScore = user.score + fullSessionScore;
-
-//       const updatedUser = {
-//         ...user,
-//         score: newScore,
-//         isMining: false,
-//         lastMiningStart: 0,
-//       };
-
-//       // Update user data in the database
-//       await db
-//         .collection("telegramUsers")
-//         .updateOne({ telegramId }, { $set: updatedUser });
-
-//       return NextResponse.json(
-//         { success: true, user: updatedUser },
-//         { status: 200 }
-//       );
-//     }
-
-//     // If the mining session is still within 4 hours, or no updates are needed:
-//     return NextResponse.json({ success: true, user }, { status: 200 });
-//   } catch (error) {
-//     console.error("Error fetching user data:", error);
-//     return NextResponse.json(
-//       { success: false, error: "Internal Server Error" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// Define level thresholds based on your previous suggestions
 const levelThresholds = [
-  0, // Level 1: 0 points
-  10000, // Level 2: 10,000 points
-  50000, // Level 3: 50,000 points
-  200000, // Level 4: 200,000 points
-  500000, // Level 5: 500,000 points
-  1000000, // Level 6: 1,000,000 points
-  5000000, // Level 7: 5,000,000 points
-  10000000, // Level 8: 10,000,000 points
-  20000000, // Level 9: 20,000,000 points
-  50000000, // Level 10: 50,000,000 points
+  0, // Level 1
+  10, // Level 2
+  100, // Level 3
+  2000, // Level 4
+  5000, // Level 5
+  10000, // Level 6
+  50000, // Level 7
+  100000, // Level 8
+  200000, // Level 9
+  500000, // Level 10
 ];
 
 export async function GET(
@@ -99,46 +41,77 @@ export async function GET(
     const now = Date.now();
     const lastMiningStart = user.lastMiningStart ?? 0;
     const timeElapsed = lastMiningStart ? now - lastMiningStart : 0;
-
-    // Calculate the effective mining speed with boosters
-    let effectiveMiningSpeed = user.miningSpeed;
-
-    // Add the permanent power booster's multiplier
-    const powerMultiplier = user.boosters.power.multiplier;
-    effectiveMiningSpeed += powerMultiplier;
-
-    // Calculate the multiplier effect of each active booster that has not expired
-    user.boosters.activeBoosters.forEach((booster) => {
-      if (booster.expiresAt && booster.expiresAt.getTime() > now) {
-        effectiveMiningSpeed *= booster.multiplier;
-      }
-    });
-
-    // Cap timeElapsed to a maximum of 4 hours if the user is still mining
     const cappedTimeElapsed = Math.min(timeElapsed, FOUR_HOURS);
 
-    // Calculate the score gain based on the time elapsed and the effective mining speed
-    const sessionScore =
-      (cappedTimeElapsed * 0.001 * effectiveMiningSpeed) / 1000;
+    // Default mining speed
+    let totalScore = 0;
+    let remainingTime = cappedTimeElapsed;
+    const defaultMiningSpeed = user.miningSpeed;
 
-    // Update the user's score if the mining session time is complete
-    if (cappedTimeElapsed >= FOUR_HOURS && user.isMining) {
-      const newScore = user.score + sessionScore;
+    // Add the permanent power booster's multiplier to the default speed
+    const powerMultiplier = user.boosters.power.multiplier;
+    const baseEffectiveSpeed = defaultMiningSpeed + powerMultiplier;
 
-      // Calculate the user's level based on the new score
-      let level = 1; // Default to level 1
-      for (let i = 0; i < levelThresholds.length; i++) {
-        if (newScore >= levelThresholds[i]) {
-          level = i + 1; // Levels are 1-indexed
-        } else {
-          break; // Stop when the next threshold is not met
+    // Remove expired cooldowns
+    const currentTimestamp = Date.now();
+    for (const [id, lastUsed] of Object.entries(user.boosters.cooldowns)) {
+      const boosterData = boosters.find((b) => b.id === id);
+      if (
+        boosterData &&
+        currentTimestamp - new Date(lastUsed).getTime() >=
+          (boosterData.cooldownDuration || 0)
+      ) {
+        delete user.boosters.cooldowns[id]; // Remove expired cooldown
+      }
+    }
+
+    // Calculate score contribution from each active booster
+    for (const booster of user.boosters.activeBoosters) {
+      const cooldown = user.boosters.cooldowns[booster.id];
+
+      if (!cooldown && booster.expiresAt) {
+        // Calculate time with the booster
+        const boosterDuration = Math.min(
+          remainingTime,
+          booster.expiresAt.getTime() - booster.lastUsed.getTime()
+        );
+
+        if (boosterDuration > 0) {
+          // Apply booster multiplier
+          const boostedSpeed = baseEffectiveSpeed * booster.multiplier;
+          totalScore += (boosterDuration * 0.001 * boostedSpeed) / 1000;
+          remainingTime -= boosterDuration;
         }
       }
 
+      // Exit loop if all time is accounted for
+      if (remainingTime <= 0) break;
+    }
+
+    // Add remaining time at the default effective speed
+    if (remainingTime > 0) {
+      totalScore += (remainingTime * 0.001 * baseEffectiveSpeed) / 1000;
+    }
+
+    // Calculate new score
+    const newScore = user.score + totalScore;
+
+    // Determine level based on new score
+    let level = 1; // Default to level 1
+    for (let i = 0; i < levelThresholds.length; i++) {
+      if (newScore >= levelThresholds[i]) {
+        level = i + 1; // Levels are 1-indexed
+      } else {
+        break;
+      }
+    }
+
+    // Update user's score if the mining session is complete
+    if (cappedTimeElapsed >= FOUR_HOURS && user.isMining) {
       const updatedUser = {
         ...user,
         score: newScore,
-        level: level, // Update the user's level
+        level,
         isMining: false,
         lastMiningStart: 0,
       };
@@ -154,8 +127,11 @@ export async function GET(
       );
     }
 
-    // If the mining session is still within 4 hours, or no updates are needed:
-    return NextResponse.json({ success: true, user }, { status: 200 });
+    // If the mining session is still ongoing or no update is needed:
+    return NextResponse.json(
+      { success: true, user: { ...user, level } },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching user data:", error);
     return NextResponse.json(
@@ -193,17 +169,17 @@ export async function POST(
       name,
       username,
       telegramId,
-      referredBy: Number(startapp), // Default to null if no referral code
-      referrals: [], // New users haven't referred anyone yet
-      score: 0, // Default score is 0
-      level: 1, // Starting at level 1 as a string (match type)
-      isMining: false, // Not mining initially
-      miningSpeed: 1, // Default mining speed is 1
-      lastMiningStart: 0, // No mining started yet, could also be Date or number if needed
+      referredBy: Number(startapp),
+      referrals: [],
+      score: 0,
+      level: 1,
+      isMining: false,
+      miningSpeed: 1,
+      lastMiningStart: 0,
       boosters: {
         power: {
-          level: 0,
-          multiplier: 1,
+          level: 1,
+          multiplier: 0,
           lastUsed: new Date(),
         },
         activeBoosters: [],
@@ -211,8 +187,8 @@ export async function POST(
       },
       weeklyStreak: 0,
       lastStreakUpdate: new Date(),
-      createdAt: new Date(), // Default to current date
-      updatedAt: new Date(), // Default to current date
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     // Insert the new user into the database

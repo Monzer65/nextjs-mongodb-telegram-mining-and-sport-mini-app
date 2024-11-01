@@ -45,7 +45,7 @@ export async function POST(
     // Initialize boosters field if it doesn't exist
     if (!user.boosters) {
       user.boosters = {
-        power: { level: 0, multiplier: 1, lastUsed: new Date() },
+        power: { level: 1, multiplier: 0, lastUsed: new Date() },
         activeBoosters: [],
         cooldowns: {},
       };

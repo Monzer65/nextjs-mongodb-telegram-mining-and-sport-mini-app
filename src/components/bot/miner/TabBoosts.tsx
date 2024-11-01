@@ -55,6 +55,7 @@ export default function TabBoosts({
   const telegramId = initTelData?.user?.id;
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [userData, setUserData] = useState<User>();
   const [now, setNow] = useState<Timestamp>(Date.now());
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<number | null>(null);
@@ -83,6 +84,13 @@ export default function TabBoosts({
     enabled: !!telegramId,
   });
 
+  useEffect(() => {
+    if (data && data?.user) {
+      const user = data.user;
+      setUserData(user);
+    }
+  }, [data]);
+
   const mutation = useMutation({
     mutationFn: ({
       boosterId,
@@ -109,35 +117,52 @@ export default function TabBoosts({
     },
   });
 
-  const calculateMultiplier = useMemo(
-    () =>
-      (booster: Booster, userBooster: UserBooster | undefined): number => {
-        if (booster.id === "fortune") {
-          return 1; // Use the random multiplier from the API response
-        }
+  const calculateMultiplier = (
+    booster: Booster,
+    userBooster: UserBooster | undefined
+  ): number => {
+    if (booster.id === "fortune") {
+      return result || 1;
+    }
 
-        if (booster.id === "power" && userBooster?.level !== undefined) {
-          return 1 + (booster.speedIncrement || 0) * userBooster.level;
-        }
+    if (booster.id === "power" && userBooster?.level !== undefined) {
+      return 1 + (booster.speedIncrement || 0) * userBooster.level;
+    }
 
-        return 8;
-      },
-    []
-  );
+    const now = new Date();
+    const daysSinceLastStreak =
+      (now.getTime() - new Date(userData?.lastStreakUpdate || now).getTime()) /
+      (1000 * 60 * 60 * 24);
 
-  const calculateBoosterCost = useMemo(
-    () => (booster: Booster, userBooster: UserBooster | undefined) => {
-      if (booster.id === "power" && userBooster) {
-        const nextLevel = (userBooster.level || 0) + 1;
-        return (
-          booster.cost *
-          Math.pow(booster.upgradeCostFactor || 1.1, nextLevel - 1)
-        );
-      }
-      return booster.cost;
-    },
-    []
-  );
+    const weeklyStreak = userData?.weeklyStreak || 0;
+    const updatedWeeklyStreak =
+      daysSinceLastStreak > 7
+        ? 1
+        : daysSinceLastStreak > 1 && daysSinceLastStreak <= 2
+        ? weeklyStreak + 1
+        : 1;
+
+    if (userData) {
+      userData.weeklyStreak = updatedWeeklyStreak;
+      userData.lastStreakUpdate = now;
+    }
+
+    const speedMultiplier = Math.min(8, 1 + updatedWeeklyStreak * 0.5);
+    return speedMultiplier;
+  };
+
+  const calculateBoosterCost = (
+    booster: Booster,
+    userBooster: UserBooster | undefined
+  ) => {
+    if (booster.id === "power" && userBooster) {
+      const nextLevel = (userBooster.level || 0) + 1;
+      return (
+        booster.cost * Math.pow(booster.upgradeCostFactor || 1.1, nextLevel - 1)
+      );
+    }
+    return booster.cost;
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -195,8 +220,6 @@ export default function TabBoosts({
     );
   }
 
-  const { user } = data;
-
   return (
     <Card className='w-full max-w-3xl mx-auto'>
       <CardHeader className='border-b mb-4'>
@@ -204,10 +227,10 @@ export default function TabBoosts({
       </CardHeader>
       <CardContent className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
         {boosters.map((booster: Booster) => {
-          const activeBooster = user.boosters.activeBoosters.find(
+          const activeBooster = userData?.boosters.activeBoosters.find(
             (b) => b.id === booster.id
           );
-          const cooldown = user.boosters.cooldowns[booster.id];
+          const cooldown = userData?.boosters.cooldowns[booster.id];
           const cooldownDate = cooldown ? new Date(cooldown) : null;
           const isActive =
             activeBooster?.expiresAt &&
@@ -216,8 +239,8 @@ export default function TabBoosts({
             cooldown &&
             new Date(cooldown).getTime() + booster.cooldownDuration! > now;
 
-          const userBooster = user.boosters[
-            booster.id as keyof typeof user.boosters
+          const userBooster = userData?.boosters[
+            booster.id as keyof typeof userData.boosters
           ] as UserBooster | undefined;
           const multiplier = calculateMultiplier(booster, userBooster);
           const level = userBooster?.level || 0;
