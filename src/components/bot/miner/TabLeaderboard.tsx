@@ -91,10 +91,19 @@ export default function TabLeaderboard({
     }
   };
 
+  function formatScore(score: number) {
+    if (score > 10000) {
+      const exponent = Math.floor(Math.log10(score));
+      const base = (score / Math.pow(10, exponent)).toFixed(1);
+      return `${base}e${exponent}`;
+    }
+    return score.toLocaleString();
+  }
+
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-full'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-blue-400' />
       </div>
     );
   }
@@ -141,7 +150,7 @@ export default function TabLeaderboard({
           <p className='text-center py-4'>{dictionary.No_players_found}</p>
         ) : (
           <ScrollArea className='h-[400px] rounded-md border'>
-            <Table className={``}>
+            <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className='w-[100px]'>{dictionary.rank}</TableHead>
@@ -200,9 +209,9 @@ export default function TabLeaderboard({
                               </span>
                             </div>
                           </TableCell>
-                          <TableCell className='text-right font-semibold'>
+                          <TableCell className='text-right font-semibold truncate'>
                             {player.score !== undefined
-                              ? player.score.toLocaleString()
+                              ? formatScore(player.score)
                               : "No Score"}
                           </TableCell>
                         </TableRow>
@@ -247,9 +256,9 @@ export default function TabLeaderboard({
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell className='text-right font-semibold'>
+                        <TableCell className='text-right font-semibold truncate'>
                           {player.score !== undefined
-                            ? player.score.toLocaleString()
+                            ? formatScore(player.score)
                             : "No Score"}
                         </TableCell>
                       </TableRow>

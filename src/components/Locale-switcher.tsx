@@ -50,6 +50,15 @@ export default function LocaleSwitcher() {
 
   useEffect(() => {
     setIsOpen(false);
+
+    // Check if the user's locale is stored in a cookie
+    const cookieLocale = getCookie("userLocale");
+    if (cookieLocale && i18n.locales.includes(cookieLocale as Locale)) {
+      setCurrentLocale(cookieLocale as Locale);
+    } else {
+      // If not, use the URL locale
+      setCurrentLocale(i18n.defaultLocale);
+    }
   }, [pathName]);
 
   return (

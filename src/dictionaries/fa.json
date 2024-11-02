@@ -44,10 +44,10 @@
       },
       "earn-tab": {
         "titles": {
-          "tasks": "تسک‌ها",
+          "tasks": "انجام تسک",
           "boost": "تقویت",
-          "referrals": "معرفی شده‌ها",
-          "mini-games": "بازی‌های کوچک"
+          "referrals": "معرفی به دیگران",
+          "mini-games": "بازی‌"
         },
         "tasks-tab": {
           "on-success-toast": {
@@ -113,20 +113,20 @@
             "description": "در فعال‌سازی خطایی رخ داد. بعدا دوباره تلاش کنید"
           },
           "error": {
-            "message": "خطایی در بارگزاری افزایندهها رخ داده",
+            "message": "خطایی در بارگزاری افزاینده‌ها رخ داده",
             "try-again-button": "دوباره تلاش کنید"
           },
           "booster_activated": "افزاینده فعال شد",
           "booster_activated_description": "افزاینده شما با موفقیت فعال شد.",
           "booster_activation_failed": "فعال‌سازی افزاینده ناموفق بود",
-          "error_loading_boosters": "خطا در بارگذاری افزایندهها. لطفاً دوباره تلاش کنید.",
+          "error_loading_boosters": "خطا در بارگذاری افزاینده‌ها. لطفاً دوباره تلاش کنید.",
           "cost": "هزینه",
           "free": "رایگان",
           "multiplier": "ضریب",
           "random": "تصادفی",
           "active_duration": "مدت زمان فعال بودن",
           "on_cooldown": "در حال انتظار",
-          "header-description": "با فعال کردن افزایندهها، سرعت استخراج را افزایش بده",
+          "header-description": "با فعال کردن افزاینده‌ها، سرعت استخراج را افزایش بده",
           "badge-active": "فعال",
           "badge-cooldown": "وقفه",
           "level": "سطح",

@@ -116,7 +116,7 @@ export default function TabMine({
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-full'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-blue-400' />
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function TabMine({
           {user.isMining ? (
             <AnimatedRipple />
           ) : mutation.isPending ? (
-            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            <Loader2 className='mr-2 h-4 w-4 animate-spin text-blue-400' />
           ) : (
             <Play className='mr-2 h-4 w-4' />
           )}

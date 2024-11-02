@@ -153,7 +153,7 @@ export default function TabTasks({
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-full'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-blue-400' />
       </div>
     );
   }
@@ -230,7 +230,7 @@ export default function TabTasks({
                       <Loader2
                         className={`${
                           lang === "en" ? "mr-2" : "ml-2"
-                        } h-4 w-4 animate-spin`}
+                        } h-4 w-4 animate-spin text-blue-400`}
                       />
                       {dictionary["check-button-loading"]}...
                     </>

@@ -93,7 +93,7 @@ export default function TabReferrals({
   if (isLoading) {
     return (
       <div className='flex items-center justify-center h-full'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-blue-400' />
       </div>
     );
   }
