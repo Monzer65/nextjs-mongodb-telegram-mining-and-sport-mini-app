@@ -29,9 +29,9 @@ type Board = Cell[];
 type Difficulty = "easy" | "medium" | "hard";
 
 const difficultyLevels: Record<Difficulty, number> = {
-  easy: 45,
-  medium: 55,
-  hard: 70,
+  easy: 40,
+  medium: 50,
+  hard: 60,
 };
 
 const generateSudokuBoard = (difficulty: Difficulty): Board => {
@@ -209,7 +209,7 @@ export default function SudokuGame({
   };
 
   return (
-    <div className='flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-200 via-blue-200 to-pink-200 p-2 md:p-4'>
+    <div className='flex flex-col items-center justify-center min-h-[400px] bg-gradient-to-br from-purple-200 via-blue-200 to-pink-200 p-2 md:p-4'>
       {gameState === "selecting" && (
         <div className='flex flex-col items-center space-y-4 md:space-y-6'>
           <h2 className='text-xl md:text-3xl font-extrabold text-gray-800'>

@@ -190,7 +190,7 @@
           "try-again-button": "Try again"
         },
         "leaderboard": "Leaderboard",
-        "header_description": "Top players by score",
+        "header_description": "Top players by score (current mining session not included)",
         "No_players_found": "No players found",
         "rank": "Rank",
         "player": "Player",

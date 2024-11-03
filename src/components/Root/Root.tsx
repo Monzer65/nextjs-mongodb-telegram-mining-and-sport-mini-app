@@ -152,8 +152,7 @@ function App(props: PropsWithChildren) {
   const username = lp.initData?.user?.username ?? "";
   const telegramId = lp.initData?.user?.id;
   const ref = searchParams.get("startapp");
-  console.log("lp", lp);
-  console.log("lp.startParam", lp.startParam);
+
   const {
     data: userData,
     isLoading,
